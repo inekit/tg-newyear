@@ -40,6 +40,7 @@ console.log('started');
             },
             8443
         );
+        console.log('webhook is started')
 
         const r = await bot.telegram.setWebhook(
            `https://${process.env.SERVER_IP}:8443/${TOKEN}`,
