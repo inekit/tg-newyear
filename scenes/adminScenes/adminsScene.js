@@ -18,7 +18,7 @@ scene.enter(async ctx => {
      await connection.query(`select a.userId, a.canUpdateAdmins 
      from navigator.admins a, navigator.admins b
      where b.userId = ?`,[ctx.from.id])
-     .catch(()=>{ ctx.answerCbQuery("DB_ERROR") })
+     .catch((e)=>{ console.log(e);ctx.answerCbQuery("DB_ERROR") })
 
     if (!ctx.scene.state.admins) return ctx.scene.enter('clientScene')
     let adminsStr = ctx.scene.state.admins.map(({userId, canUpdateAdmins})=> `<a href="tg://user?id=${userId}">${userId}</a> ${canUpdateAdmins?'Суперадмин':""}`).join("\n\n").toString()

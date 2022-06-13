@@ -17,7 +17,7 @@ scene.enter(async ctx => {
      await connection.query(`select *
      from navigator.addresses p, navigator.admins b
      where b.userId = ? and p.cityId = ?`,[ctx.from.id, ctx.scene.state.cityId])
-     .catch(()=>{ ctx.replyWithTitle("DB_ERROR") })
+     .catch((e)=>{ console.log(e);ctx.replyWithTitle("DB_ERROR") })
 
 
      if (!ctx.scene.state.points) ctx.scene.enter('clientScene')
@@ -49,7 +49,7 @@ scene.action(/^point\-([0-9]+)$/g, async ctx => {
      await (await tOrmCon).query(`select *
      from navigator.addresses p, navigator.admins b
      where b.userId = ? and p.id = ?`,[ctx.from.id, selectedId])
-     .catch(()=>{ return ctx.editMenu(ctx.getTitle("DB_ERROR")) })
+     .catch((e)=>{console.log(e); return ctx.editMenu(ctx.getTitle("DB_ERROR")) })
 
      if (!pointsInfo || !pointsInfo.length) ctx.editMenu(ctx.getTitle("NO_POINT_INFO"))
 

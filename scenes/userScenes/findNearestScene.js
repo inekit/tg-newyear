@@ -12,7 +12,7 @@ const findNearestScene = new WizardScene('findNearestScene',cityHandler,coordina
     const connection = await tOrmCon
 
     const cities = ctx.scene.state.cities = await connection.getRepository("City")
-    .find().catch(()=>{ ctx.replyWithTitle("DB_ERROR") })
+    .find().catch((e)=>{ console.log(e);ctx.replyWithTitle("DB_ERROR") })
 
     const keyboard = { name: 'cities_list_keyboard', args: [cities] }
     const title = "CHOOSE_CITY"
@@ -52,7 +52,7 @@ function getNearestPoints(longitude, latitude, cityId){
         from (select id,name, cityId,street, house, building,longitude,latitude from navigator.addresses) a
         inner join navigator.cities c on c.id = a.cityId WHERE a.cityId=?
         order by distance`,[longitude,latitude, cityId])
-        .catch((e)=>{ rej("DB_ERROR") })
+        .catch((e)=>{ console.log(e); rej("DB_ERROR") })
 
         if (!points?.length) rej("NO_POINTS")
 

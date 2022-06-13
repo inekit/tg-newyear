@@ -18,7 +18,8 @@ const clientScene = new CustomWizardScene('clientScene')
     let userObj = (await connection.query(
             "SELECT id, DATEDIFF(now(),u.lastUse) loginAgo,userId FROM navigator.users u left join navigator.admins a on a.userId = u.id where u.id = ? limit 1", 
             [ctx.from?.id])
-        .catch(()=>{
+        .catch((e)=>{
+            console.log(e)
             ctx.replyWithTitle("DB_ERROR")
         }))
 
@@ -31,6 +32,7 @@ const clientScene = new CustomWizardScene('clientScene')
         userObj = await connection.getRepository("User")
         .save({id: ctx.from.id})
         .catch((e)=>{
+            console.log(e)
             ctx.replyWithTitle("DB_ERROR")
         })
     }
@@ -40,7 +42,8 @@ const clientScene = new CustomWizardScene('clientScene')
         await connection.query(
             "UPDATE navigator.users u SET lastUse = now() WHERE id = ?", 
             [ctx.from?.id])
-        .catch(()=>{
+        .catch((e)=>{
+            console.log(e)
             ctx.replyWithTitle("DB_ERROR")
         })
     }

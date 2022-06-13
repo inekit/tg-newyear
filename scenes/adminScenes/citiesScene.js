@@ -27,7 +27,7 @@ scene.enter(async ctx => {
      await connection.query(`select *
      from navigator.cities c, navigator.admins b
      where b.userId = ?`,[ctx.from.id])
-     .catch(()=>{ ctx.replyWithTitle("DB_ERROR") })
+     .catch((e)=>{console.log(e); ctx.replyWithTitle("DB_ERROR") })
 
 
      if (!ctx.scene.state.cities) ctx.scene.enter('clientScene')
