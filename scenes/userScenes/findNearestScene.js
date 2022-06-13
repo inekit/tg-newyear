@@ -157,7 +157,7 @@ fullListHandler.action("show_more", async ctx => {
 
     const points = ctx.wizard.state.input?.points
 
-    const take = ctx.wizard.state.take = 3;
+    const take = ctx.wizard.state.take = 10;
 
     ctx.replyWithKeyboard('FULL_POINT_INFO',{name: 'show_more_points_keyboard', args: [points?.slice(0,take), 1, points.length>take]})
 
