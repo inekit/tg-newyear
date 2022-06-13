@@ -42,7 +42,7 @@ console.log('started');
         );
         console.log('webhook is started')
 
-        const r = await bot.telegram.setWebhook(
+        /*const r = await bot.telegram.setWebhook(
            `https://${process.env.SERVER_IP}:8443/${TOKEN}`,
            {
              certificate: { source: "./cert.pem" },
@@ -50,8 +50,8 @@ console.log('started');
              allowed_updates,
              drop_pending_updates: true,
            }
-         );'
-         console.log('webhook is set')'
+         );
+         console.log('webhook is set')'*/
     } else {
         await bot.launch({
             allowedUpdates: allowed_updates,
