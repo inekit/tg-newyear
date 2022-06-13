@@ -1,10 +1,11 @@
 const mysql = require('mysql2');
+require('dotenv').config()
 
 const param = {
     host: "127.0.0.1",
-    user: 'bestchange-user',
-    database: "navigator",
-    password: 'nicklzxnicklzx',
+    user: process.env.DB_USER,
+    database: process.env.DATABASE,
+    password: process.env.DB_PASSWORD,
     waitForConnections: true,
 };
 const sesParams = {
