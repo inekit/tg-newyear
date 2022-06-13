@@ -105,7 +105,7 @@ addressHandler.on('text',async (ctx)=>{
             else await ctx.replyWithTitle('POINT_INFO_ADMIN',[display_name, p.description]);
         }*/
     })
-    .catch((error) => {
+    .catch(async (error) => {
         if (!ctx.scene.state.locationCorrect) return ctx.replyWithTitle("CANT RECOGNIZE ADDRESS")
         
         await ctx.replyWithKeyboard('.','admin_back_keyboard')
