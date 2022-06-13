@@ -106,7 +106,12 @@ addressHandler.on('text',async (ctx)=>{
         }*/
     })
     .catch((error) => {
-        return ctx.replyWithTitle("CANT RECOGNIZE ADDRESS")
+        if (!ctx.scene.state.locationCorrect) return ctx.replyWithTitle("CANT RECOGNIZE ADDRESS")
+        
+        await ctx.replyWithKeyboard('.','admin_back_keyboard')
+        await ctx.replyWithKeyboard('POINT_ADDING_INFO','confirm_keyboard',
+        [ctx.scene.state.input?.name, `${ctx.scene.state.city}, ул. ${addrReg?.[1]}, д. ${addrReg?.[2]}${addrReg?.[3]? ', к. '+addrReg?.[3] : "" }`])
+
     })
     
 })
