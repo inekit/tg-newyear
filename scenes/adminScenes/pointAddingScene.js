@@ -73,17 +73,21 @@ addressHandler.on('text',async (ctx)=>{
     geocoder.search( { street: addrReg?.[0], city: ctx.scene.state.city, countrycodes:"ru", limit:5 } )
     .then(async (response) => {
 
-        let input = ctx.scene.state.input = {
-            name: ctx.scene.state.input?.name,
-            street:addrReg?.[1],
-            house:addrReg?.[2],
-            building:addrReg?.[3],
-        }
+        ctx.scene.state.input = ctx.scene.state.input ?? {}
+        
+
+        ctx.scene.state.input.name;
+        ctx.scene.state.input.street = addrReg?.[1];
+        ctx.scene.state.input.house = addrReg?.[2];
+        ctx.scene.state.input.street = addrReg?.[3];
+
         if (!response || !response.length) throw new Error("CANT RECOGNIZE ADDRESS");
 
-        input.latitude = ctx.scene.state.input.latitude = response[0]?.lat;
-        input.longitude = ctx.scene.state.input.longitude = response[0]?.lon;
 
+        ctx.scene.state.input.latitude = response[0]?.lat;
+        ctx.scene.state.input.longitude = response[0]?.lon;
+
+        let input = ctx.scene.state.input;
 
         await ctx.telegram.sendLocation(ctx.from.id, response[0]?.lat, response[0]?.lon)
         
