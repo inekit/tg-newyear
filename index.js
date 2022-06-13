@@ -12,6 +12,9 @@ const TOKEN =
 
 const bot = new Telegraf(TOKEN);
 
+console.log('started')
+
+
 (async() => {
 
 
@@ -47,7 +50,7 @@ const bot = new Telegraf(TOKEN);
              drop_pending_updates: true,
            }
          );
-         console.log('webhook is set',r)
+         console.log('webhook is set')
     } else {
         await bot.launch({
             allowedUpdates: allowed_updates,
