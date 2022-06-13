@@ -12,7 +12,7 @@ const TOKEN =
 
 const bot = new Telegraf(TOKEN);
 
-console.log('started')
+console.log('started');
 
 
 (async() => {
