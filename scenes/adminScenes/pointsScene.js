@@ -82,7 +82,7 @@ deleteHandler.action('back', async ctx => {
 
 deleteHandler.action('confirm', async ctx => {
 
-    const res = await require('../../Utils/authAdmin')(ctx.from.id, false)
+    const res = await require('../../Utils/authAdmin')(ctx.from.id)
     .catch(()=>{ ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');})
 
 

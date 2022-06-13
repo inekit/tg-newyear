@@ -122,7 +122,7 @@ addressHandler.action('confirm',async (ctx)=>{
     const input = {latitude,longitude, name, street, house, building} = ctx.scene.state.input
     const cityId = ctx.scene.state.cityId;
 
-    const res = await (require('../../Utils/authAdmin')(ctx.from.id, false))
+    const res = await (require('../../Utils/authAdmin')(ctx.from.id))
     .catch(()=>{ ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');})
 
 
