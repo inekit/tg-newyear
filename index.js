@@ -32,8 +32,8 @@ const bot = new Telegraf(TOKEN);
 
         await bot.startWebhook(
             `/${TOKEN}`, {
-                key: readFileSync(".Certs/PRIVATE.key"),
-                cert: readFileSync(".Certs/PUBLIC.pem"),
+                key: readFileSync("./key.pem"),
+                cert: readFileSync("./cert.pem"),
             },
             8443
         );
@@ -41,7 +41,7 @@ const bot = new Telegraf(TOKEN);
         await bot.telegram.setWebhook(
            `https://${process.env.SERVER_IP}:8443/${TOKEN}`,
            {
-             certificate: { source: ".Certs/PUBLIC.pem" },
+             certificate: { source: "./cert.pem" },
              ip_address: process.env.SERVER_IP,
              allowed_updates,
              drop_pending_updates: true,
