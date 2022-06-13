@@ -28,9 +28,15 @@ const cities = new Set()
 async function parseCities(){
     points?.["Лист1"].forEach(async p=>{
         console.log(0)
-
+        
         await cities.add(p.city.trim())
     })
+}
+
+async function insertCities(){
+    cities.forEach(async c=>{
+        conn.query('insert into navigator.cities (name) values (?)',[c])
+       })
 }
 
 async function parsePoints(){
@@ -45,6 +51,8 @@ async function parsePoints(){
 
 async function parse(){
     await parseCities()
+
+    await insertCities()
 
     await parsePoints()
 
