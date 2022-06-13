@@ -25,20 +25,28 @@ async function parseCity({city, street, house, building,name}){
 
 const cities = new Set()
 
-async function parse(){
+async function parseCities(){
     points?.["Лист1"].forEach(async p=>{
+        console.log(0)
 
         await cities.add(p.city.trim())
     })
+}
 
+async function parsePoints(){
     const unresolved = new Set()
-
+    console.log(1)
     points?.["Лист1"].forEach(async point => {
         unresolved.add(await parseCity(point))
         console.log(unresolved)
 
     });
+}
 
+async function parse(){
+    await parseCities()
+
+    await parsePoints()
 
 }
 
