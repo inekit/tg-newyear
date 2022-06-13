@@ -1,7 +1,7 @@
 const mysql = require('mysql2');
 
 const param = {
-    host: '62.109.12.174',
+    host: "127.0.0.1",
     user: 'bestchange-user',
     database: "navigator",
     password: 'nicklzxnicklzx',

@@ -13,6 +13,7 @@ module.exports = new EntitySchema({
         name: {
             type: "varchar",
             length: 200,
+            unique: true
         }
     },
 });

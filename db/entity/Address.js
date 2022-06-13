@@ -19,7 +19,8 @@ module.exports = new EntitySchema({
             nullable: false
         },
         house: {
-            type: "int",
+            type: "varchar",
+            length: 20,
             nullable: false
         },
         building: {
