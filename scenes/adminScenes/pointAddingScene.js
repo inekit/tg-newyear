@@ -79,7 +79,7 @@ addressHandler.on('text',async (ctx)=>{
         ctx.scene.state.input.name;
         ctx.scene.state.input.street = addrReg?.[1];
         ctx.scene.state.input.house = addrReg?.[2];
-        ctx.scene.state.input.street = addrReg?.[3];
+        ctx.scene.state.input.building = addrReg?.[3];
 
         if (!response || !response.length) throw new Error("CANT RECOGNIZE ADDRESS");
 
