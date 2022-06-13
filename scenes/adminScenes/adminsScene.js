@@ -58,7 +58,7 @@ adminIdHandler.action('confirm', async ctx => {
 
     const res = await require('../../Utils/authAdmin')(ctx.from.id, true);
 
-    if (!res) return ctx.answerCbQuery("CANT AUTH");
+    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("Admin").delete({userId: ctx.scene.state.deletingId})
@@ -109,7 +109,7 @@ roleHandler.action('confirm', async ctx=>{
     
     const res = await (require('../../Utils/authAdmin')(ctx.from.id, true));
 
-    if (!res) return ctx.answerCbQuery("CANT AUTH");
+    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("Admin").insert({userId: newId, canUpdateAdmins})

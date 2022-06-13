@@ -10,6 +10,6 @@ module.exports = (tgId, canUpdateAdmins)=>new Promise(async (resolve, reject)=>{
     .then(res=>{
         console.log(res)
         if (res) return resolve(res, connection)
-        reject("NO SUCH ADMIN")
+        reject("NO_SUCH_ADMIN")
     }).catch((e)=>{ console.log(e); reject("DB_ERROR") })
 })

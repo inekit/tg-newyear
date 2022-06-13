@@ -79,9 +79,9 @@ deleteHandler.action('back', async ctx => {
 
 deleteHandler.action('confirm', async ctx => {
 
-    const res = await require('../../Utils/authAdmin')(ctx.from.id, true);
+    const res = await require('../../Utils/authAdmin')(ctx.from.id, false);
 
-    if (!res) return ctx.answerCbQuery("CANT AUTH");
+    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("City").delete({id: ctx.scene.state.deletingId})
@@ -117,9 +117,9 @@ cityNameHandler.on('message', ctx=>{
 confirmHandler.action('confirm', async ctx=>{
     const {cityName} = ctx.scene.state
     
-    const res = await (require('../../Utils/authAdmin')(ctx.from.id, true));
+    const res = await (require('../../Utils/authAdmin')(ctx.from.id, false));
 
-    if (!res) return ctx.answerCbQuery("CANT AUTH");
+    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("City").insert({name: cityName})
