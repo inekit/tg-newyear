@@ -56,9 +56,10 @@ adminIdHandler.action(/^admin\-([0-9]+)$/g, async ctx => {
 
 adminIdHandler.action('confirm', async ctx => {
 
-    const res = await require('../../Utils/authAdmin')(ctx.from.id, true);
+    const res = await require('../../Utils/authAdmin')(ctx.from.id, true)
+    .catch(()=>{ ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');})
 
-    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
+    if (!res) { return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("Admin").delete({userId: ctx.scene.state.deletingId})
@@ -107,9 +108,10 @@ newIdHandler.action('cancel', async ctx=>{
 roleHandler.action('confirm', async ctx=>{
     const {newId,canUpdateAdmins} = ctx.scene.state
     
-    const res = await (require('../../Utils/authAdmin')(ctx.from.id, true));
+    const res = await (require('../../Utils/authAdmin')(ctx.from.id, true))
+    .catch(()=>{ ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');})
 
-    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
+    if (!res) { return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("Admin").insert({userId: newId, canUpdateAdmins})

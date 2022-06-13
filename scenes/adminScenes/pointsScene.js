@@ -82,9 +82,11 @@ deleteHandler.action('back', async ctx => {
 
 deleteHandler.action('confirm', async ctx => {
 
-    const res = await require('../../Utils/authAdmin')(ctx.from.id, false);
+    const res = await require('../../Utils/authAdmin')(ctx.from.id, false)
+    .catch(()=>{ ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');})
 
-    if (!res) { ctx.answerCbQuery("CANT_AUTH");return ctx.scene.enter('clientScene');}
+
+    if (!res) { return ctx.scene.enter('clientScene');}
 
     const connection = await tOrmCon
     await connection.getRepository("Address").delete({id: ctx.scene.state.selectedId})
