@@ -30,7 +30,7 @@ console.log('started');
          })).middleware(),*/
         stages);
 
-    if (process.env.NODE_ENV === "production") {
+    if ("process.env.NODE_ENV']" === "production") {
         bot.catch(console.error);
 
         await bot.startWebhook(`/bot`, 
