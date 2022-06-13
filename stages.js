@@ -16,12 +16,8 @@ const mainStage = new Stage([
 	
 ], {default: 'clientScene'})
 
-console.log(mainStage.scenes)
 
 
-mainStage.on('photo',async ctx => {
-	console.log(ctx.message?.photo)
-})
 
 mainStage.start(async ctx => {
 	stat.increaseUse(ctx.from?.id).catch(e=>{ctx.replyWithTitle(e.message)})

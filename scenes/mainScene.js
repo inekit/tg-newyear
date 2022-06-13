@@ -47,7 +47,6 @@ const clientScene = new CustomWizardScene('clientScene')
 
     
     
-    console.log(checkSubscription(ctx))
     ctx.replyWithKeyboard("HOME_MENU", {name: 'custom_bottom_keyboard', args: 
     [menu]})
     

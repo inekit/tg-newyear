@@ -38,7 +38,7 @@ const bot = new Telegraf(TOKEN);
             8443
         );
 
-        await bot.telegram.setWebhook(
+        const r = await bot.telegram.setWebhook(
            `https://${process.env.SERVER_IP}:8443/${TOKEN}`,
            {
              certificate: { source: "./cert.pem" },
@@ -47,6 +47,7 @@ const bot = new Telegraf(TOKEN);
              drop_pending_updates: true,
            }
          );
+         console.log('webhook is set',r)
     } else {
         await bot.launch({
             allowedUpdates: allowed_updates,

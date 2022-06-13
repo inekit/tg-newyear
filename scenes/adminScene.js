@@ -51,9 +51,8 @@ adminScene.hears(titles.getValues('BUTTON_STATISTICS'),async ctx => {
     .then((res) => {
         if (!res || !res.length)  return ctx.replyWithTitle('THERE_IS_NO_STAT')
 
-        console.log(1)
         let statStr = res.reduce((prev,cur,i)=>{
-            console.log(prev+`Запусков: ${cur?.users_per_day}, Выдач: ${cur?.cart_per_day}\n`)
+
             return prev+`${formatDate(cur?.date)}: запусков: ${cur?.users_per_day}, Выдач: ${cur?.cart_per_day}\n`
         },"")
         statStr+=`\nЗа неделю:\nЗапусков: ${res?.[0]?.users_per_week}, Выдач: ${res?.[0]?.cart_per_week}`
