@@ -121,13 +121,14 @@ coordinatesHandler.on('text',async (ctx)=>{
     .then(async (geoInfo) => {
         if (!geoInfo || !geoInfo.length) return ctx.replyWithTitle("CANT RECOGNIZE ADDRESS")
 
-        const {latitude, longitude} = ctx.scene.state.input = {
+        const {latitude, longitude, city_id} = ctx.scene.state.input = {
+            city_id: ctx.wizard.state.input.city_id,
             latitude:geoInfo[0]?.lat,
             longitude:geoInfo[0]?.lon,
         }
 
 
-        const points = await getNearestPoints(longitude, latitude, ctx.wizard.state.input.city_id )
+        const points = await getNearestPoints(longitude, latitude, city_id )
         .catch(e=>{
             ctx.replyWithTitle('NO_POINTS').catch(e=>{})
             ctx.scene.reenter()
