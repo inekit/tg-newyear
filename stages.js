@@ -18,7 +18,7 @@ const mainStage = new Stage([
 
 
 mainStage.on('photo',ctx=>{
-	console.log(ctx)
+	console.log(ctx.message.photo)
 })
 
 mainStage.start(async ctx => {
