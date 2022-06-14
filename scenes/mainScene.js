@@ -8,7 +8,7 @@ const clientScene = new CustomWizardScene('clientScene')
 .enter(async ctx=>{
 
     if (!(await checkSubscription(ctx))) {
-        await ctx.replyWithPhoto('AgACAgIAAxkBAAMYYqiZkmQg8xkCcIj3OokhJeyr690AAlu9MRuZZUhJSC37U0EiRkoBAAMCAAN4AAMkBA').catch(console.log)
+        await ctx.replyWithPhoto('AgACAgIAAxkBAAICXGKou9pIMB83HdvoqSl7q27T2pV_AALtvTEbmWVISTGw020E7Ay1AQADAgADcwADJAQ').catch(console.log)
         return ctx.replyWithKeyboard("GREETING", 'subscribe_keyboard')
     }
 
