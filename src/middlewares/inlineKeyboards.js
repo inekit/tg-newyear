@@ -334,7 +334,7 @@ exports.categories_list_keyboard = (ctx, data) => {
 
      keyboard.reply_markup.inline_keyboard.push(
         [callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`), `back_random`)],
-        [callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
+        //[callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
     )
 
     return keyboard
@@ -349,7 +349,7 @@ exports.item_keyboard = (ctx, link, category_name) => {
 }
 exports.item_keyboard_main = (ctx, link) => {
 
-    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`),callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)]], { columns: 2 })
+    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`),/*callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)*/]], { columns: 2 })
 
     return keyboard
 }

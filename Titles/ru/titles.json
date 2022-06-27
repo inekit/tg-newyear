@@ -65,5 +65,6 @@
   "BUTTON_GET_RANDOM_AGAIN": "Новая случайная ссылка",
   "BUTTON_GET_RANDOM_AGAIN_CATEGORY": "Новая случайная ссылка*",
   "BUTTON_GET_RANDOM": "Случайная ссылка",
-  "PARSING_ERROR": "Неверный формат файла"
+  "PARSING_ERROR": "Неверный формат файла",
+  "BUTTON_ALL_CATEGORIES": "По всем категориям"
 }
