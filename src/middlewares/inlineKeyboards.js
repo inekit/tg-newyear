@@ -333,6 +333,7 @@ exports.categories_list_keyboard = (ctx, data) => {
 
 
      keyboard.reply_markup.inline_keyboard.push(
+        [callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`), `back_random`)],
         [callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
     )
 

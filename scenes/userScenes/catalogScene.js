@@ -47,7 +47,7 @@ scene.action(/^category\-(.+)$/g, async ctx => {
     await ctx.answerCbQuery().catch(console.log);
 
     const cNameExec = /^https\:\/\/t.me\/(.+)$/g.exec(link?.trim());
-    
+
     const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
 
     ctx.scene.state.temp_post = await ctx.replyWithKeyboard('ITEM_CARD_CATEGORY', {name: 'item_keyboard', args: [link, category_name]}, [category_name, cTitle])
@@ -80,6 +80,13 @@ scene.action('next', async ctx => {
 })
 
 
+
+
+scene.action('back_random', async ctx => {
+    ctx.answerCbQuery().catch(console.log);
+
+    ctx.scene.enter('clientScene',{edit: true, random: true})
+})
 
 scene.action('back', async ctx => {
     ctx.answerCbQuery().catch(console.log);

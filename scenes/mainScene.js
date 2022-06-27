@@ -8,7 +8,7 @@ const store = require('../store')
 const clientScene = new CustomWizardScene('clientScene')
 .enter(async ctx=>{
 
-    const { edit } = ctx.scene.state
+    const { edit, random } = ctx.scene.state
 
     const connection = await tOrmCon
 
@@ -46,6 +46,17 @@ const clientScene = new CustomWizardScene('clientScene')
         })
     }
 
+    if (random) {
+        const link = store.getAllRandomLink();
+
+        const cNameExec = /^https\:\/\/t.me\/(.+)$/g.exec(link?.trim());
+
+        const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
+
+        if (edit && !userObj?.userId) return ctx.editMenu(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
+        return ctx.replyWithKeyboard(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
+
+    }
     //console.log(store.getAllRandomLink())
     const keyboard =  'main_menu_keyboard'//{name: 'main_menu_keyboard', args: [store.getAllRandomLink(),userObj?.userId]};
     if (edit && !userObj?.userId) return ctx.editMenu("HOME_MENU", keyboard)
