@@ -71,10 +71,7 @@ exports.admin_main_keyboard_owner = ctx =>
  Markup.keyboard([
 
 	[
-		ctx.getTitle('BUTTON_STATISTICS'),
-	],
-	[
-		ctx.getTitle('BUTTON_CITIES'),		
+		ctx.getTitle('BUTTON_CATEGORIES'),		
 	],
 	[ctx.getTitle('BUTTON_ADMINS')],
 	[ 
@@ -84,7 +81,7 @@ exports.admin_main_keyboard_owner = ctx =>
 ]).resize();
 
 
-exports.main_keyboard = (ctx, isAgent,isAlpinist,isAdmin) => {
+exports.main_keyboard = (ctx, isAgent,isAlpinist) => {
 
 	const buttons = []
 
@@ -94,10 +91,6 @@ exports.main_keyboard = (ctx, isAgent,isAlpinist,isAdmin) => {
 
     buttons.push([ 
 		ctx.getTitle(isAlpinist ? 'BUTTON_ALPINIST_MENU' : 'BUTTON_REGISTER_ALPINIST')
-	])
-
-    if (isAdmin) buttons.push([ 
-		ctx.getTitle('BUTTON_ADMIN_MENU')
 	])
 
 	return Markup.keyboard(buttons).resize()

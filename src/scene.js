@@ -62,7 +62,7 @@ addHandler = (handler) => {
 
   }
 
-  async replyStep(ctx, cursor, previousInfo = 0){
+  async replyStep(ctx, cursor, previousInfo = false){
 
     if (cursor<0 || cursor>=this.steps.length) return;
 
@@ -70,9 +70,11 @@ addHandler = (handler) => {
     
     //const nextStepInfo = this.steps.getStepDataById(cursor)
 
+    console.log(keyboard)
+
     const {kbTop, kbBottom} = ctx.initKeyboards(keyboard)
   
-    await ctx.sendInputReply(ctx,header, kbTop,kbBottom, previousInfo)
+    await ctx.sendInputReply(ctx,header, keyboard,keyboard, previousInfo)
   
     if (!ctx.wizard && cursor!==0) throw new Error('cant change step with no wizard')
 

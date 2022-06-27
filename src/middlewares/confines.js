@@ -94,6 +94,9 @@ class ConfineChecker {
         },
 
     
+        number(text){
+            if (parseInt(text)==text) return true;
+        },
     
         string255(text){
             if (text.length <= 255) return true

@@ -11,8 +11,8 @@ const AppDataSource = new DataSource({
     database: process.env.DATABASE,
     entities: [
         require("./entity/User"),
-        require("./entity/City"),
-        require("./entity/Address"),
+        require("./entity/Category"),
+        require("./entity/Channel"),
         require("./entity/Admin"),
         require("./entity/Statistics")
     ],

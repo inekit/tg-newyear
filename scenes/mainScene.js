@@ -3,20 +3,17 @@ const { Telegraf, Composer, Scenes: { WizardScene } } = require('telegraf')
 const { CustomWizardScene, titles} = require('telegraf-steps-engine');
 const { confirmDialog } = require('telegraf-steps-engine/replyTemplates');
 const tOrmCon = require("../db/data-source");
+const store = require('../store')
 
 const clientScene = new CustomWizardScene('clientScene')
 .enter(async ctx=>{
 
-    if (!(await checkSubscription(ctx))) {
-        await ctx.replyWithPhoto('AgACAgIAAxkBAAICXGKou9pIMB83HdvoqSl7q27T2pV_AALtvTEbmWVISTGw020E7Ay1AQADAgADcwADJAQ').catch(console.log)
-        return ctx.replyWithKeyboard("GREETING", 'subscribe_keyboard')
-    }
+    const { edit } = ctx.scene.state
 
     const connection = await tOrmCon
 
-    let menu=[['FIND_NEAREST_SCENE_BUTTON']]
     let userObj = (await connection.query(
-            "SELECT id, DATEDIFF(now(),u.lastUse) loginAgo,userId FROM navigator.users u left join navigator.admins a on a.userId = u.id where u.id = ? limit 1", 
+            "SELECT id, DATEDIFF(now(),u.lastUse) loginAgo,userId FROM channels.users u left join channels.admins a on a.userId = u.id where u.id = ? limit 1", 
             [ctx.from?.id])
         .catch((e)=>{
             console.log(e)
@@ -27,7 +24,8 @@ const clientScene = new CustomWizardScene('clientScene')
 
     if (!userObj) {
 
-        ctx.replyWithKeyboard("GREETING", {name: 'custom_bottom_keyboard', args: [menu]})
+        ctx.replyWithKeyboard("GREETING",'main_menu_back_keyboard')
+
         
         userObj = await connection.getRepository("User")
         .save({id: ctx.from.id})
@@ -37,10 +35,10 @@ const clientScene = new CustomWizardScene('clientScene')
         })
     }
     
-    if (userObj?.userId) menu.push(['ADMIN_SCENE_BUTTON'])
+    if (userObj?.userId) await ctx.replyWithKeyboard("#", {name: 'custom_bottom_keyboard', args: [[['ADMIN_SCENE_BUTTON']]]})
     else if (userObj?.loginAgo!=="0") {
         await connection.query(
-            "UPDATE navigator.users u SET lastUse = now() WHERE id = ?", 
+            "UPDATE channels.users u SET lastUse = now() WHERE id = ?", 
             [ctx.from?.id])
         .catch((e)=>{
             console.log(e)
@@ -48,39 +46,54 @@ const clientScene = new CustomWizardScene('clientScene')
         })
     }
 
-    
-    
-    ctx.replyWithKeyboard("HOME_MENU", {name: 'custom_bottom_keyboard', args: 
-    [menu]})
-    
+    //console.log(store.getAllRandomLink())
+    const keyboard =  'main_menu_keyboard'//{name: 'main_menu_keyboard', args: [store.getAllRandomLink(),userObj?.userId]};
+    if (edit && !userObj?.userId) return ctx.editMenu("HOME_MENU", keyboard)
+    await ctx.replyWithKeyboard("HOME_MENU",keyboard)
     
     
 })	
 
+clientScene.action('random_link', async ctx => {
+    ctx.answerCbQuery().catch(console.log);
 
-async function checkSubscription(ctx){
+    const link = store.getAllRandomLink();
 
-    const res = await ctx.telegram.getChatMember(-1001388153893, ctx.from?.id).catch(console.log)
+    const cNameExec = /^https\:\/\/t.me\/(.+)$/g.exec(link?.trim());
 
-    if (!res) return
+    console.log(cNameExec, link)
 
-    if(res?.status === 'administrator' || res?.status === 'creator' || res?.status === 'member') return true
+    const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
 
-    return
-}
-
-clientScene.action('checkSubscribe', async ctx=>{
-    await ctx.answerCbQuery().catch(console.log)
-
-    ctx.scene.reenter()
+    ctx.scene.state.temp_post = await ctx.editMenu(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
+    
 })
 
-clientScene.hears(titles.getTitle('FIND_NEAREST_SCENE_BUTTON','ru'), ctx=>{
-    ctx.scene.enter('findNearestScene').catch(e=>ctx.replyWithTitle(`Нет такой сцены findNearestScene`));
+clientScene.action('hide', async ctx => {
+    ctx.answerCbQuery().catch(console.log);
+    ctx.scene.reenter({edit: true})
 })
+
+
+clientScene.hears(titles.getTitle('CATALOG_BUTTON','ru'), ctx=>{
+    
+    ctx.scene.enter('catalogScene', )//.catch(e=>ctx.replyWithTitle(`Нет такой сцены`));
+})
+
+clientScene.action('categories',ctx=>{
+    ctx.answerCbQuery().catch(console.log);
+
+    ctx.scene.enter('catalogScene', {edit: true});
+})
+clientScene.action('admin_menu',ctx=>{
+    ctx.answerCbQuery().catch(console.log);
+
+    ctx.scene.enter('adminScene', {edit: true});
+})
+
 
 clientScene.hears(titles.getTitle('ADMIN_SCENE_BUTTON','ru'), ctx=>{
-    ctx.scene.enter('adminScene').catch(e=>ctx.replyWithTitle(`Нет такой сцены`));
+    ctx.scene.enter('adminScene')//.catch(e=>ctx.replyWithTitle(`Нет такой сцены`));
 })
 
 module.exports = [clientScene]

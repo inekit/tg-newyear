@@ -16,7 +16,7 @@ scene.enter(async ctx => {
     const connection = await tOrmCon
     ctx.scene.state.admins = 
      await connection.query(`select a.userId, a.canUpdateAdmins 
-     from navigator.admins a, navigator.admins b
+     from channels.admins a, channels.admins b
      where b.userId = ?`,[ctx.from.id])
      .catch((e)=>{ console.log(e);ctx.answerCbQuery("DB_ERROR") })
 

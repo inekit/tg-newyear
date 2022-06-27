@@ -7,11 +7,11 @@ const stat = require("./Utils/statistics")
 const mainStage = new Stage([ 
 	...require('./scenes/mainScene'),
 	require('./scenes/adminScene'),
-	...require('./scenes/userScenes/findNearestScene'),
+
+	require('./scenes/userScenes/catalogScene'),
+
 	require('./scenes/adminScenes/adminsScene'),
-	require('./scenes/adminScenes/citiesScene'),
-	require('./scenes/adminScenes/pointAddingScene'),
-	require('./scenes/adminScenes/pointsScene'),
+	require('./scenes/adminScenes/categoriesScene'),
 
 	
 ], {default: 'clientScene'})
@@ -23,7 +23,6 @@ const mainStage = new Stage([
 
 mainStage.start(async ctx => {
 	stat.increaseUse(ctx.from?.id).catch(e=>{ctx.replyWithTitle(e.message)})
-
 
 	ctx.scene.enter('clientScene')
 })

@@ -4,6 +4,7 @@ const { Markup } = require('telegraf')
 const { main_menu_back_keyboard } = require('./keyboards')
 
 const callbackButton = Markup.button.callback
+const urlButton = Markup.button.url
 const { inlineKeyboard } = Markup
 
 
@@ -27,12 +28,8 @@ exports.shedle_keyboard = (ctx, shedle) => {
     return keyboard
 }
 
-exports.cities_list_keyboard = (ctx, cities) => {
 
-    const keyboard = inlineKeyboard(cities.map(({ id, name }) => callbackButton(name ?? "default", "city-"+id)), { columns: 2 })
 
-    return keyboard
-}
 
 
 exports.city_keyboard = (ctx ) => {
@@ -80,6 +77,7 @@ exports.alpinists_list_keyboard = (ctx, alpinists) => {
 
     return keyboard
 }
+
 
 exports.admins_actions_keyboard = (ctx ) => {
 
@@ -267,61 +265,7 @@ exports.skip_previous_keyboard = (ctx) => inlineKeyboard([
 ], { columns: 2 })
 
 
-exports.client_actions_keyboard = (ctx) => this.custom_keyboard(ctx,["BUTTON_UPDATE", "BUTTON_DELETE"],
- ["update_client","delete_client"])
 
- exports.fine_keyboard = (ctx) => this.custom_keyboard(ctx,["BUTTON_CONFIRM", "BUTTON_REFUSE","BUTTON_CANCEL"],
- ["status-true","status-false","cancel"])
-
- exports.order_actions_keyboard = (ctx, status) => {
-
-    console.log(status)
-    const keyboard = inlineKeyboard([], { columns: 2 })
-
-    if (!status) keyboard.reply_markup.inline_keyboard.push([
-        callbackButton(ctx.getTitle("BUTTON_UPDATE"), 'update_order'),
-        callbackButton(ctx.getTitle("BUTTON_SEND_ORDER"), 'send_order'),
-        callbackButton(ctx.getTitle('BUTTON_DELETE'), 'delete_order')
-
-    ]) 
-    else if (status === 'issued') keyboard.reply_markup.inline_keyboard.push([
-        callbackButton(ctx.getTitle("BUTTON_ADD_CLAIM"), 'add_claim'),
-        callbackButton(ctx.getTitle("BUTTON_SEND_ORDER"), 'send_order'),
-        callbackButton(ctx.getTitle('BUTTON_DELETE'), 'delete_order')
-
-    ])
-    else if (status === 'leadset') keyboard.reply_markup.inline_keyboard.push([
-        callbackButton(ctx.getTitle("BUTTON_ADD_CLAIM"), 'add_claim'),
-    ])
-    else if (status === 'gotMoney') keyboard.reply_markup.inline_keyboard.push([
-        callbackButton(ctx.getTitle("BUTTON_ADD_CLAIM"), 'add_claim'),
-        callbackButton(ctx.getTitle("BUTTON_SET_COMPLETED"), 'set_completed'),
-    ])
-
-    return keyboard
-}
-
-exports.order_client_actions_keyboard = (ctx, status) => {
-
-    const keyboard = inlineKeyboard([], { columns: 2 })
-
-    if (status === 'leadset') keyboard.reply_markup.inline_keyboard.push([
-        callbackButton(ctx.getTitle("SET_COMPLETED"), 'set_completed'),
-        callbackButton(ctx.getTitle("ADD_CLAIM"), 'add_claim'),
-
-    ])
-    else if (status === 'gotMoney') keyboard.reply_markup.inline_keyboard.push([
-    ])
-
-    return keyboard
-}
-
- exports.update_order_keyboard = (ctx) => this.custom_keyboard(ctx,
-    ['BUTTON_ORDER_HEADER','BUTTON_ORDER_START',
-     'BUTTON_ORDER_CONTENT', 'BUTTON_ORDER_ADRESS','BUTTON_ORDER_PRICE', 'BUTTON_ORDER_COMISSION', 'BUTTON_ORDER_PTYPE',
-     'BUTTON_ORDER_WORKS', 'BUTTON_ORDER_FILES'],
-    ['update_header','update_dtime_start','update_content', 'update_address', 
-     'update_price', 'update_comission', 'update_payment_type', 'update_works','update_files'])
 
  exports.client_settings_keyboard = (ctx) => this.custom_keyboard(ctx,["NAME", "CONTRACT_TYPE", "CONTACTS"],
  ["update_name","update_contract_type", "update_contacts"])
@@ -338,12 +282,6 @@ exports.confirm_cancel_keyboard = (ctx) => inlineKeyboard([
 
 ], { columns: 1 })
 
-exports.send_to_alp_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'back'),
-    callbackButton(ctx.getTitle('BUTTON_SEND_TO_ALPINISTS'), 'send_to_alpinists')
-
-], { columns: 1 })
 
 
 exports.go_back_keyboard = (ctx) => inlineKeyboard([
@@ -368,65 +306,73 @@ exports.confirm_keyboard = (ctx) => inlineKeyboard([
     callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm')
 ])
 
-exports.confirm_bbo_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm_bbo')
-])
-
-exports.enough_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_ENOUGH'), 'confirm')
-])
-
-exports.confirm_add_client_keyboard = (ctx) => inlineKeyboard([
-
-    //callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-    callbackButton(ctx.getTitle('BUTTON_ADD_CONTACT'), 'addContact')
-])
-
-exports.confirm_and_cert_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-    callbackButton(ctx.getTitle('BUTTON_ADD_CERTIFICATE'), 'addCertificate')
-])
 
 
 
-exports.confirm_add_contact_comm_keyboard = (ctx) => inlineKeyboard([
+exports.main_menu_keyboard = (ctx) => {
 
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-    callbackButton(ctx.getTitle('BUTTON_ADD_METHOD'), 'addMethod'),
-    callbackButton(ctx.getTitle('BUTTON_ADD_CONTACT'), 'addContact')
-], { columns: 1 })
 
-exports.add_delete_contact_comm_keyboard = (ctx, contacts) => {
-    const keyboard = inlineKeyboard(contacts.map(({ contact_id, name }) => callbackButton(name, "contact-"+contact_id)), { columns: 2 })
+//urlButton(ctx.getTitle(`BUTTON_RANDOM`), link)
+    const keyboard = inlineKeyboard(
+       // link ?
+         [[callbackButton(ctx.getTitle('BUTTON_GET_RANDOM'), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`)]]
+        // [[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`)]]
+        )
 
-    keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('BUTTON_ADD_CONTACT'), 'addContact')]
+
+    return keyboard
+}
+
+exports.categories_list_keyboard = (ctx, data) => {
+
+
+    const keyboard = inlineKeyboard(Object.entries(data).map(([name, link ]) => 
+     //urlButton(name, link)
+     callbackButton(name, `category-${name}`)
+     ), { columns: 2 })
+
+
+     keyboard.reply_markup.inline_keyboard.push(
+        [callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
     )
 
     return keyboard
 }
 
 
-exports.show_more_points_keyboard = (ctx, point, page, pagination) => {
-    const keyboard = inlineKeyboard(
-        point.map(({ distance, pointName, pointId}) => 
-        callbackButton(ctx.getTitle("BUTTON_SMP", [pointName,  Math.trunc( distance ), pointName]), "point-"+pointId)), 
-        { columns: 1 })
-    
-        console.log(keyboard.reply_markup.inline_keyboard)
-    if (pagination)
-        keyboard.reply_markup.inline_keyboard.push([
-            callbackButton(ctx.getTitle('BUTTON_PREVIOUS'), 'previous'),
-            callbackButton(page.toString(), 'no'),
-            callbackButton(ctx.getTitle('BUTTON_NEXT'), 'next')
-        ])
+exports.item_keyboard = (ctx, link, category_name) => {
+
+    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN_CATEGORY`,[`: ${category_name}`]), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`)]], { columns: 2 })
+
+    return keyboard
+}
+exports.item_keyboard_main = (ctx, link) => {
+
+    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`),callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)]], { columns: 2 })
+
     return keyboard
 }
 
-exports.subscribe_keyboard = (ctx) => inlineKeyboard([
-    [callbackButton(ctx.getTitle('BUTTON_SUBSCRIBE'), 'checkSubscribe')]
-], { columns: 1 })
 
+
+exports.categories_list_admin_keyboard = (ctx, data) => {
+
+    const keyboard = inlineKeyboard(data.map((name) => 
+     callbackButton(name, `category-${name}`)), { columns: 2 })
+
+     keyboard.reply_markup.inline_keyboard.push(
+        [callbackButton(ctx.getTitle(`BUTTON_ADD_FILE`), `add-file`)],
+        [callbackButton(ctx.getTitle(`BUTTON_ADD_ZIP_FILE`), `add-zip-file`)],
+        [callbackButton(ctx.getTitle(`BUTTON_ADD_CATEGORY`), `add-category`)],
+    )
+    
+    return keyboard
+}
+
+
+exports.category_admin_keyboard = (ctx, name) => {
+
+    const keyboard = inlineKeyboard([[callbackButton(ctx.getTitle(`BUTTON_ADD_FILE`), `add-file-${name}`)],[callbackButton(ctx.getTitle(`BUTTON_DELETE`), `delete-category-${name}`)],[callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)]])
+
+    return keyboard
+}

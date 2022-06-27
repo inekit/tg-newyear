@@ -24,7 +24,7 @@ adminScene.enter(async ctx=>{
 
 
 
-adminScene.hears(titles.getValues('BUTTON_CITIES'), ctx => ctx.scene.enter('citiesScene', { main_menu_button }))
+adminScene.hears(titles.getValues('BUTTON_CATEGORIES'), ctx => ctx.scene.enter('categoriesScene', { main_menu_button }))
 
 adminScene.hears(titles.getValues('BUTTON_ADMINS'), ctx => ctx.scene.enter('adminsScene', { main_menu_button }))
 
@@ -44,9 +44,9 @@ function formatDate(date) {
 adminScene.hears(titles.getValues('BUTTON_STATISTICS'),async ctx => {
     const connection =await tOrmCon
     connection.query(`SELECT date, users_per_day, cart_per_day, users_per_week, cart_per_week from 
-	(SELECT date, users_per_day, cart_per_day FROM navigator.statistics
+	(SELECT date, users_per_day, cart_per_day FROM shop.statistics
 	WHERE DATEDIFF(now(), date) < 7) day,
-    (SELECT sum(users_per_day) users_per_week, sum(cart_per_day) cart_per_week FROM navigator.statistics
+    (SELECT sum(users_per_day) users_per_week, sum(cart_per_day) cart_per_week FROM shop.statistics
 	WHERE DATEDIFF(now(), date) < 7 GROUP BY date) week`)
     .then((res) => {
         if (!res || !res.length)  return ctx.replyWithTitle('THERE_IS_NO_STAT')

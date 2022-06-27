@@ -1,9 +1,8 @@
 const { Telegraf, Composer, Scenes: { WizardScene } } = require('telegraf')
-const addressQuery = require("../Modules/addrByCoordinates")
+//const addressQuery = require("../Modules/addrByCoordinates")
 const {passedConfines, sendInputReply, initKeyboards} = require("./middlewares")
-const store = require('../LocalStorage/store')
-const dialogs = require('./dialogs')
-const updates = require('../Modules/updates')
+//const dialogs = require('./dialogs')
+//const updates = require('../Modules/updates')
 const middlewares = require("./middlewares")
 const query = require('../DB/performQuery')
 const actions = require('./actions');
@@ -20,9 +19,9 @@ class FilesHandler extends Composer{
 
         this.on('photo', ctx=>inputFile(ctx, "photo"))
 
-        this.on('audio', ctx=>inputFile(ctx, "audio"))
+        //this.on('audio', ctx=>inputFile(ctx, "audio"))
         
-        this.on('document', ctx=>inputFile(ctx, "document"))
+        //this.on('document', ctx=>inputFile(ctx, "document"))
         
         this.action('confirm', async ctx => confirmCb(ctx))
     }
@@ -45,7 +44,7 @@ class CoordinatesHandler extends Composer{
 
 //ptype/works/coordinates
 
-async function updateDialogPart(ctx, next, sceneName){
+/*async function updateDialogPart(ctx, next, sceneName){
 
     switch (next){
         case "BUTTON_ADD_ADDRESS": if (await updates.addAlpinist(ctx)) {
@@ -91,126 +90,18 @@ async function updateDialogPart(ctx, next, sceneName){
         
 
     }
-}
-
-function createH (type, stepInfo, nextStepInfo, scene){
-
-    //console.log(type, stepInfo.variable, stepInfo?.handler, stepInfo?.handler_template, stepInfo?.skipToInfo)
-
-    const cursor = stepInfo?.skipToInfo?.cursor
-    //console.log(1222, stepInfo.variable, cursor)
-    const handler = stepInfo?.handler_template ?? stepInfo?.handler ?? new Composer()
-
-    //setInterval(()=>console.log(1222, stepInfo.variable, cursor), 1000)
-    if (stepInfo?.skipToInfo) handler.action('skip', async ctx=>{
-        await ctx.answerCbQuery().catch(console.log)
-
-        const {header, keyboard} = stepInfo?.skipToInfo
-
-        //console.log(cursor)
-
-        if (header && cursor) {
-            const {kbBottom, kbTop} = middlewares.initKeyboards(keyboard)
-            if (keyboard) ctx.replyWithKeyboard(header, kbBottom ?? kbTop)
-            else ctx.replyWithTitle(header)
-
-            ctx.wizard.selectStep(cursor)
-        } 
-        
-    });
-    //skipText
-    //console.log(stepInfo.options)
-    if (type==="select") { 
-        if (stepInfo.options && !stepInfo.cb) handler.action(stepInfo.options, ctx=>actions.addInput(ctx, stepInfo?.variable, nextStepInfo?.header, null, nextStepInfo?.keyboard));
-        else if (stepInfo.options && stepInfo.cb) handler.action(stepInfo.options, ctx=>stepInfo?.cb(ctx)); 
-        else throw new Error('no opt or cb'); 
-        return handler}
-    if (type==="action") { return handler}
-    else if (type==="input")
-    handler.on('text', async ctx => 
-     dialogs.addSceneInput(
-         ctx, {stepName: stepInfo.variable, 
-            header: nextStepInfo?.header ?? `ENTER_${nextStepInfo?.variable?.toUpperCase()}`, 
-            kbName: nextStepInfo?.keyboard, 
-            confineNames: stepInfo.confines, 
-            sceneName: null
-        }))
-
-    else {
-        //console.log('cb',stepInfo?.cb)
-        if ( type === 'confirm' && stepInfo?.cb) handler.action('confirm', async ctx => {stepInfo?.cb(ctx)})
-        else if (type === 'confirm_next' || type === 'confirm') handler.action('confirm', async ctx => {
-
-            //console.log(stepInfo,stepInfo.next)
+}*/
 
 
-            const status = await updateDialogPart(ctx, stepInfo.next, scene)
-    
-            if (status) {
-                if (scene !== 'ordersScene') return await ctx.scene.enter('alpinistScene')
-
-                delete ctx.scene.state.input
-            } else {
-                delete ctx.scene.state.input
-                return await ctx.scene.reenter()
-            }
-
-            
-        
-        })
-        if (type === 'confirm') {
-            
-            if (!stepInfo?.handler_template) handler.on('text', async ctx => 
-            dialogs.addSceneInput(
-                ctx, {stepName: stepInfo.variable, 
-                    header: 'Подтвердите добавление', 
-                    kbName: {name: 'custom_keyboard', args: 
-                    [['BUTTON_CONFIRM'],['confirm']]}, 
-                    confineNames: stepInfo.confines, 
-                    sceneName: null,
-                    isLast: true
-                }))
-
-            
-        } 
-        if (type === 'confirm_next'){
-
-            if (!stepInfo?.handler_template) handler.on('text', async ctx => 
-            dialogs.addSceneInput(
-                ctx, {stepName: stepInfo.variable, 
-                    header: stepInfo?.confirm_header ?? `ENTER_${nextStepInfo?.variable?.toUpperCase()}`, 
-                    kbName: {name: 'custom_keyboard', args: 
-                        [['BUTTON_ENOUGH', nextStepInfo?.next ?? 'Продолжить'],['confirm', 'next']]}, 
-                    confineNames: stepInfo.confines, 
-                    sceneName: null,
-                    isLast: true
-                }))
-
-            handler.action('next', async ctx => {
-
-                await updateDialogPart(ctx, stepInfo.next)
-            
-                ctx.wizard.state.input={}
-            
-                ctx.wizard.next()
-            
-                return dialogs.startDialog(ctx,nextStepInfo?.header ?? '.', nextStepInfo?.keyboard)
-            
-            })
-        }
-    }
-    
-    return handler
-}
 
 audiosHandler.on('audio', ctx=>inputFile(ctx, "audio"))
 
-audiosHandler.action('confirm', async ctx => dialogs.confirmDialog(ctx, "ENTER_COORDINATES", "skip_keyboard"))
+//audiosHandler.action('confirm', async ctx => dialogs.confirmDialog(ctx, "ENTER_COORDINATES", "skip_keyboard"))
 
 
 photosHandler.on('photo', ctx=>inputFile(ctx, "photo"))
 
-photosHandler.action('confirm', async ctx => dialogs.confirmDialog(ctx, "ENTER_AUDIO", "skip_keyboard"))
+//photosHandler.action('confirm', async ctx => dialogs.confirmDialog(ctx, "ENTER_AUDIO", "skip_keyboard"))
 
 
 
@@ -230,7 +121,7 @@ function inputFile(ctx, type){
 
     ctx.wizard.state.input?.[type+"s"].push(file_id)
 
-    if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, type+"s", ctx.wizard.state.input?.[type+"s"], ctx.from.id)
+    //if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, type+"s", ctx.wizard.state.input?.[type+"s"], ctx.from.id)
 
     const {kbTop, kbBottom} = middlewares.initKeyboards("enough_keyboard")
 
@@ -248,7 +139,7 @@ async function handleLocation(ctx){
         if (!ctx.wizard.state.input) ctx.wizard.state.input = {}
 
         let {latitude, longitude} = ctx.message.location
-		const addressInput = await addressQuery(latitude, longitude);
+		const addressInput = 1//await addressQuery(latitude, longitude);
 
         Object.assign(ctx.wizard.state.input , addressInput?.[0])
 
@@ -273,12 +164,12 @@ coordinatesHandler.action('confirm', async ctx => {
 
         console.log(coordinates, nav_address, city, region, district, order_id)
 
-        if(await store.updateAddr(coordinates, nav_address, city, region, district, order_id)) 
+        /*if(await store.updateAddr(coordinates, nav_address, city, region, district, order_id)) 
             
             await ctx.answerCbQuery(ctx.getTitle("ORDER_HAS_BEEN_UPDATED")).catch(console.log)
 
         else await ctx.answerCbQuery(ctx.getTitle("ORDER_HAS_NOT_BEEN_UPDATED")).catch(console.log)
-
+*/
         delete ctx.scene.state.input
 
         return ctx.scene.enter("orderSettingsScene",{edit: true, order_id:ctx.scene.state.order_id})
@@ -341,12 +232,12 @@ worksHandler.action(/^work\-(.+)$/g, async ctx => {
     if (!ctx.scene.state.input?.works || !Array.isArray(ctx.scene.state.input?.works)) ctx.scene.state.input.works = []
 
     console.log(ctx.scene.state.input.works)
-
+/*
     if (!ctx.scene.state.input.works.includes(store.works[ctx.match[1]])) 
         ctx.scene.state.input.works.push(store.works[ctx.match[1]]);
 
     if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, 'works', ctx.scene.state.input.works, ctx.from.id)
-
+*/
 
     const {kbTop, kbBottom} = middlewares.initKeyboards("work")
 
@@ -364,7 +255,7 @@ worksHandler.action('confirm', async ctx => {
 
         const order_id = ctx.scene.state.order_id
 
-        if(await store.updateWorks(works, order_id)) 
+        if(1/*await store.updateWorks(works, order_id)*/) 
             
         await ctx.answerCbQuery(ctx.getTitle("ORDER_HAS_BEEN_UPDATED")).catch(console.log)
 
@@ -376,7 +267,7 @@ worksHandler.action('confirm', async ctx => {
     } else if (ctx.scene.state.sceneName === "alpinistProfileScene") {
         const {works} = ctx.scene.state.input
 
-        if(await store.updateProfileWorks(works, ctx.from.id)) 
+        if(1/*await store.updateProfileWorks(works, ctx.from.id)*/) 
             
         await ctx.answerCbQuery(ctx.getTitle("WORKS_HAS_BEEN_UPDATED")).catch(console.log)
 
@@ -389,7 +280,7 @@ worksHandler.action('confirm', async ctx => {
     
     await ctx.answerCbQuery().catch(console.log)
     
-    dialogs.confirmDialog(ctx, "ENTER_FILES", 'skip_keyboard')
+    //dialogs.confirmDialog(ctx, "ENTER_FILES", 'skip_keyboard')
 
     
 
@@ -416,7 +307,7 @@ pTypeHandler.action(/^pay\_(agent|alpinist)$/, async ctx=>{
 
     ctx.scene.state.input.payment_type = ctx.match[1]
 
-    if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, 'payment_type', ctx.scene.state.input.payment_type, ctx.from.id)
+    //if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, 'payment_type', ctx.scene.state.input.payment_type, ctx.from.id)
 
     const {keyboard, header} = {keyboard:'work', header:'ENTER_WORKS'}//ctx.steps.nextStepData(ctx.wizard.cursor)
 
@@ -431,13 +322,13 @@ pTypeHandler.action(/^pay\_(agent|alpinist)$/, async ctx=>{
 
 async function addOrder (ctx){
 
-    const order_id = await store.addOrder(ctx.wizard.state.input);
+    const order_id = 1//await store.addOrder(ctx.wizard.state.input);
     
     ctx.scene.state.order_id = order_id;
 
     if (order_id) {
 
-        store.removeOrderDraft(ctx.from.id)
+        //store.removeOrderDraft(ctx.from.id)
 
         return ctx.replyWithKeyboard("ORDER_HAS_BEEN_ADDED", "send_to_alp_keyboard");
         

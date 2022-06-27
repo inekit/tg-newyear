@@ -49,8 +49,8 @@ module.exports = {
         return ConfineChecker.passedConfines(ctx?.message?.text,confineNames, stepName)
     },
     
-    async sendInputReply(ctx, header, kbTop, kbBottom, showInputs = true){
-    
+    async sendInputReply(ctx, header, kbTop, kbBottom, showInputs = false){
+        showInputs = false
         //console.log(kbTop, kbBottom)
         if (!ctx) throw new Error('no ctx')
 
@@ -90,9 +90,10 @@ module.exports = {
             await ctx.replyWithMediaGroup(photos)
         }
 
-        const pm2 = showInputs ? kbTop ? (await ctx.replyWithKeyboard(ctx.getTitle("ADDING_STATUS",[paramsString]), kbTop))?.message_id 
+        const pm2 = showInputs===true ? kbTop ? (await ctx.replyWithKeyboard(ctx.getTitle("ADDING_STATUS",[paramsString]), kbTop))?.message_id 
         : (await ctx.replyWithTitle(ctx.getTitle("ADDING_STATUS",[paramsString])))?.message_id 
         :  null
+        
         const pm3 = header ?  
         kbBottom ? (await ctx.replyWithKeyboard(header, kbBottom))?.message_id  : (await ctx.replyWithTitle(header))?.message_id 
             : null

@@ -65,15 +65,16 @@ class Steps{
         return this
     }
 
-    addMenu = ({ variable, header, options, prefix, cb, confines,skipTo, skipText }, sceneName) => {
-        const fo = formatMenuOptions(options, sceneName)
-        this.addStep({type: 'menu',
-            header,
-            keyboard: {name: 'custom_bottom_keyboard', args: [Object.keys(fo)]},
-            options: fo,
-            skipTo, skipText
-        })
-  
+    addMenu =  ({ variable, header, options, prefix, cb, confines,skipTo, skipText }, sceneName) => {
+        (async ()=>{
+            const fo = await formatMenuOptions(options, sceneName)
+            this.addStep({type: 'menu',
+                header,
+                keyboard: {name: 'custom_bottom_keyboard', args: [Object.keys(fo)]},
+                options: fo,
+                skipTo, skipText
+            })
+        })()
         return this
     }
   
@@ -148,14 +149,17 @@ function formatSelectOptions(soArray){
     return Object.values(soArray)
 }
 
-function formatMenuOptions(soArray, sceneName) {
-    console.log(111, sceneName)
+async function formatMenuOptions(soArray, sceneName) {
+    console.log(111, sceneName, await soArray)
+    soArray = await soArray
     if (!(
         typeof soArray === 'object' &&
         soArray !== null
     ))  throw new Error('menu opt should be an obj')
      "ff".concat('_BUTTON')
     if (Array.isArray(soArray)) return soArray.reduce((prev,cur,i)=>{
+        cur=cur.toString()
+
         const formattedSN = sceneName ? `${sceneName?.replace(/([A-Z])/g, '_$1')?.trim()?.toUpperCase()}_BUTTON_` : 'BUTTON_';
         const autoNaming = formattedSN + cur?.replace(/([A-Z])/g, '_$1')?.trim()?.toUpperCase()
 
