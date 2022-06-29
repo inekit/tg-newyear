@@ -24,7 +24,10 @@ const clientScene = new CustomWizardScene('clientScene')
 
     if (!userObj) {
 
-        ctx.replyWithPhoto(ctx.getTitle('GREETING_PHOTO'), {caption: ctx.getTitle("GREETING")}).catch(e=>{console.log('no photo to send')})
+        ctx.replyWithPhoto(ctx.getTitle('GREETING_PHOTO'), {caption: ctx.getTitle("GREETING")}).catch(e=>{
+            console.log('no photo to send');
+            ctx.replyWithTitle("GREETING");
+        })
         
         userObj = await connection.getRepository("User")
         .save({id: ctx.from.id})
