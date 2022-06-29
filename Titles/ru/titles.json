@@ -77,6 +77,6 @@
   "ENTER_MAIN_TEXT": "Введите новый текст меню \"О БОТЕ\".",
   "ENTER_PHOTO": "Загрузите новое приветственное фото",
   "GREETING_PHOTO": "AgACAgIAAxkBAAJmpmK8M-dOOo81VjoPgUnxlUGJg9nXAAIawzEbgOvgSV5L5aHF0qXaAQADAgADcwADKQQ",
-  "BUTTON_CHANGE_CARD": "Введите новый текст в категориях.",
+  "BUTTON_CHANGE_CARD": "Сменить текст в категориях.",
   "ENTER_CARD_TEXT": "Введите новый текст при переходе в категорию"
 }
