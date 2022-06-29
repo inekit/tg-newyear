@@ -72,9 +72,11 @@
   "BUTTON_CHANGE_GREETING": "Сменить приветствие",
   "BUTTON_CHANGE_HELP": "Сменить текст \"О БОТЕ\"",
   "BUTTON_CHANGE_PHOTO": "Загрузить приветств. фото",
-  "CHANGE_TEXT": "<b>Текущий текст приветствия</b>:\n\n*\n\n<b>Текущий текст \"О БОТЕ\"</b>:\n\n*",
+  "CHANGE_TEXT": "<b>Текущий текст приветствия</b>:\n\n*\n\n<b>Текущий текст \"О БОТЕ\"</b>:\n\n*<b>Текущий текст при переходе в категорию</b>:\n\n*",
   "ENTER_GREETING_TEXT": "Введите новый текст приветствия.",
   "ENTER_MAIN_TEXT": "Введите новый текст меню \"О БОТЕ\".",
   "ENTER_PHOTO": "Загрузите новое приветственное фото",
-  "GREETING_PHOTO": "AgACAgIAAxkBAAJmpmK8M-dOOo81VjoPgUnxlUGJg9nXAAIawzEbgOvgSV5L5aHF0qXaAQADAgADcwADKQQ"
+  "GREETING_PHOTO": "AgACAgIAAxkBAAJmpmK8M-dOOo81VjoPgUnxlUGJg9nXAAIawzEbgOvgSV5L5aHF0qXaAQADAgADcwADKQQ",
+  "BUTTON_CHANGE_CARD": "Введите новый текст в категориях.",
+  "ENTER_CARD_TEXT": "Введите новый текст при переходе в категорию"
 }

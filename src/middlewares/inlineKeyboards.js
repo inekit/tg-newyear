@@ -94,6 +94,7 @@ exports.change_text_actions_keyboard = (ctx ) => {
     const keyboard = inlineKeyboard([
         callbackButton(ctx.getTitle("BUTTON_CHANGE_GREETING"), 'change_greeting'),
         callbackButton(ctx.getTitle("BUTTON_CHANGE_HELP"), 'change_help'),
+        callbackButton(ctx.getTitle("BUTTON_CHANGE_CARD"), 'change_card'),
         callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), 'change_photo')
     ], { columns: 1 })
 

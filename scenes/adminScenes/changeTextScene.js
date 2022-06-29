@@ -36,6 +36,7 @@ scene.action(/change\_(.+)/g, ctx=>{
 
     switch (type){
         case 'greeting': {ctx.replyStep(0); break;}
+        case 'card': {ctx.replyStep(3); break;}
         case 'help': {ctx.replyStep(1); break;}
         case 'photo': {ctx.replyStep(2); break;}
 
@@ -59,12 +60,12 @@ scene
     })
 })
 .addStep({variable: 'main_text', type: 'confirm', cb: (ctx=>{
-    ctx.answerCbQuery().catch(console.log);
+        ctx.answerCbQuery().catch(console.log);
 
-    ctx.setTitle('HOME_MENU',ctx.scene.state.input?.main_text)
+        ctx.setTitle('HOME_MENU',ctx.scene.state.input?.main_text)
 
-    ctx.scene.reenter()
-})
+        ctx.scene.reenter()
+}   )
 })
 .addStep({
     variable: 'photo', 
@@ -76,7 +77,15 @@ scene
 
         ctx.scene.reenter()
     })     
-   })
+})
+.addStep({variable: 'card_text', type: 'confirm', cb: (ctx=>{
+    ctx.answerCbQuery().catch(console.log);
+
+    ctx.setTitle('...',ctx.scene.state.input?.card_text)
+
+    ctx.scene.reenter()
+}   )
+})
 
 scene.action('deleteAdmin', async ctx => {
 
