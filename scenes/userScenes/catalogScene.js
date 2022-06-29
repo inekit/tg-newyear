@@ -84,7 +84,7 @@ scene.hears(store.getCategoriesWithCountStr(), async ctx=>{
 
     const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
 
-    await ctx.replyWithKeyboard("...",{name: 'main_menu_bottom_keyboard', args: [ctx.scene.state?.userObj?.userId]})
+    await ctx.replyWithKeyboard("CATEGORY_ADD_TITLE",{name: 'main_menu_bottom_keyboard', args: [ctx.scene.state?.userObj?.userId]})
 
     ctx.scene.state.temp_post = await ctx.replyWithKeyboard(ctx.getTitle('ITEM_CARD_CATEGORY', [cTitle, category_name ?? "Все каналы",store.getCount(category_name)]), {name: 'item_keyboard', args: [link, category_name]})
     

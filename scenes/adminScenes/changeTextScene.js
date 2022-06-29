@@ -21,7 +21,7 @@ scene.enter(async ctx => {
     if (!res) { return ctx.scene.enter('clientScene');}
 
     const keyboard = 'change_text_actions_keyboard'
-    const title = ctx.getTitle("CHANGE_TEXT",[ctx.getTitle("GREETING"), ctx.getTitle("HOME_MENU")])
+    const title = ctx.getTitle("CHANGE_TEXT",[ctx.getTitle("GREETING"), ctx.getTitle("HOME_MENU"), ctx.getTitle("CATEGORY_ADD_TITLE")])
 
     if (main_menu_button) await ctx.replyWithKeyboard('⚙️', main_menu_button)
 
@@ -81,7 +81,7 @@ scene
 .addStep({variable: 'card_text', type: 'confirm', cb: (ctx=>{
     ctx.answerCbQuery().catch(console.log);
 
-    ctx.setTitle('...',ctx.scene.state.input?.card_text)
+    ctx.setTitle('CATEGORY_ADD_TITLE',ctx.scene.state.input?.card_text)
 
     ctx.scene.reenter()
 }   )

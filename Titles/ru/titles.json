@@ -67,7 +67,7 @@
   "PARSING_ERROR": "Неверный формат файла",
   "BUTTON_ALL_CATEGORIES": "Все каналы *",
   "BUTTON_ABOUT": "BUTTON_ABOUT",
-  "...": "...",
+  "CATEGORY_ADD_TITLE": "...",
   "BUTTON_CHANGE_TEXT": "Тексты",
   "BUTTON_CHANGE_GREETING": "Сменить приветствие",
   "BUTTON_CHANGE_HELP": "Сменить текст \"О БОТЕ\"",
