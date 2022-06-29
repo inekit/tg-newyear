@@ -63,7 +63,11 @@ class Titles {
 
 	setTitle(title, value) {
 
-		this.dictionary[title] = value
+		this.dictionary[title] = value;
+
+		let file = JSON.parse(fs.readFileSync(`${this.dataFolder}/ru/titles.json`, 'utf-8'))
+		file[title] = value
+		fs.writeFileSync(`${this.dataFolder}/ru/titles.json`, JSON.stringify(file, null, 2));
 	}
 
 	getValues(title) {

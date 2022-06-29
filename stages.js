@@ -12,6 +12,7 @@ const mainStage = new Stage([
 
 	require('./scenes/adminScenes/adminsScene'),
 	require('./scenes/adminScenes/categoriesScene'),
+	require('./scenes/adminScenes/changeTextScene'),
 
 	
 ], {default: 'clientScene'})
@@ -30,6 +31,7 @@ mainStage.start(async ctx => {
 mainStage.hears(titles.getValues('BUTTON_BACK_ADMIN'), ctx => ctx.scene.enter('adminScene',))
 mainStage.hears(titles.getValues('BUTTON_ADMIN_MENU'), ctx => ctx.scene.enter('adminScene',))
 mainStage.hears(titles.getValues('BUTTON_BACK_USER'), ctx => ctx.scene.enter('clientScene',))
+mainStage.hears(titles.getValues('BUTTON_ABOUT'), ctx => ctx.replyWithKeyboard("HOME_MENU"))
 
 
 

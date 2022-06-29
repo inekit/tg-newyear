@@ -89,6 +89,17 @@ exports.admins_actions_keyboard = (ctx ) => {
     return keyboard
 }
 
+exports.change_text_actions_keyboard = (ctx ) => {
+
+    const keyboard = inlineKeyboard([
+        callbackButton(ctx.getTitle("BUTTON_CHANGE_GREETING"), 'change_greeting'),
+        callbackButton(ctx.getTitle("BUTTON_CHANGE_HELP"), 'change_help'),
+        callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), 'change_photo')
+    ], { columns: 1 })
+
+    return keyboard
+}
+
 
 exports.admins_list_keyboard = (ctx, admins) => {
 
@@ -323,18 +334,20 @@ exports.main_menu_keyboard = (ctx) => {
     return keyboard
 }
 
-exports.categories_list_keyboard = (ctx, data) => {
+exports.categories_list_keyboard = (ctx, data, totalCount) => {
 
 
-    const keyboard = inlineKeyboard(Object.entries(data).map(([name, link ]) => 
-     //urlButton(name, link)
-     callbackButton(name, `category-${name}`)
-     ), { columns: 2 })
+
+    const categoryButtons = Object.entries(data)?.sort(SortArray)?.map(([name, {link, count} ]) => {
+       return callbackButton(`${name} ${count}`, `category-${name}`)
+   })
+    const keyboard = inlineKeyboard([callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`,[totalCount]), `back_random`),...categoryButtons], { columns: 1 })
 
 
      keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`), `back_random`)],
+        [callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`,[totalCount]), `back_random`)],
         //[callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
+        
     )
 
     return keyboard
@@ -343,22 +356,27 @@ exports.categories_list_keyboard = (ctx, data) => {
 
 exports.item_keyboard = (ctx, link, category_name) => {
 
-    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN_CATEGORY`,[`: ${category_name}`]), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`)]], { columns: 2 })
+    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)]]);//,[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN_CATEGORY`,[`: ${category_name}`]), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`)]], { columns: 2 })
 
     return keyboard
 }
 exports.item_keyboard_main = (ctx, link) => {
 
-    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)],[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`),/*callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)*/]], { columns: 2 })
+    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)]]);//,[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`),/*callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)*/]], { columns: 2 })
 
     return keyboard
 }
 
+function SortArray([name],[name2]){
+    if (name < name2) {return -1;}
+    if (name > name2) {return 1;}
+    return 0;
+}
 
 
 exports.categories_list_admin_keyboard = (ctx, data) => {
 
-    const keyboard = inlineKeyboard(data.map((name) => 
+    const keyboard = inlineKeyboard(data?.sort(SortArray)?.map((name) => 
      callbackButton(name, `category-${name}`)), { columns: 2 })
 
      keyboard.reply_markup.inline_keyboard.push(

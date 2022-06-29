@@ -38,6 +38,47 @@ exports.custom_botkeyboard = (ctx, registered) => {
 	return Markup.keyboard(buttons).resize()
 }
 
+exports.main_menu_bottom_keyboard = (ctx, isAdmin) => {
+
+	const buttons = [
+		[ 
+			ctx.getTitle('BUTTON_RANDOM'),
+		],
+		[ 
+			ctx.getTitle('BUTTON_CATEGORIES'),
+		],
+		[ 
+			ctx.getTitle('BUTTON_BACK_USER'),
+		],
+	]
+
+	if (isAdmin) buttons.push([ctx.getTitle('ADMIN_SCENE_BUTTON')])
+
+	return Markup.keyboard(buttons).resize()
+}
+
+
+
+
+exports.categories_list_keyboard_bottom = (ctx, data, totalStr) => {
+
+	
+
+    const categoryButtons = data?.map((name) => {
+       return [name];
+   })
+
+   categoryButtons?.push([totalStr])
+    
+
+   return Markup.keyboard(categoryButtons).resize()
+
+}
+
+
+
+
+
 exports.pay_agent_keyboard = (ctx) => Markup.keyboard([
 
 	ctx.getTitle('BUTTON_PAY_AGENT_SUBSCRIPTION'),
@@ -56,10 +97,10 @@ exports.pay_alpinist_keyboard = (ctx) => Markup.keyboard([
 exports.admin_main_keyboard = ctx=>Markup.keyboard([
 
 	[
-		ctx.getTitle('BUTTON_STATISTICS'),
+		ctx.getTitle('BUTTON_CATEGORIES'),		
 	],
 	[
-		ctx.getTitle('BUTTON_CITIES'),		
+		ctx.getTitle('BUTTON_CHANGE_TEXT'),
 	],
 	[ 
 		ctx.getTitle('BUTTON_CLIENT_MENU'),
@@ -73,28 +114,19 @@ exports.admin_main_keyboard_owner = ctx =>
 	[
 		ctx.getTitle('BUTTON_CATEGORIES'),		
 	],
-	[ctx.getTitle('BUTTON_ADMINS')],
+	[
+		ctx.getTitle('BUTTON_ADMINS')
+	],
+	[
+		ctx.getTitle('BUTTON_CHANGE_TEXT'),
+	],
 	[ 
 		ctx.getTitle('BUTTON_CLIENT_MENU'),
-	],
+	]
 
 ]).resize();
 
 
-exports.main_keyboard = (ctx, isAgent,isAlpinist) => {
-
-	const buttons = []
-
-	buttons.push([ 
-		ctx.getTitle(isAgent ? 'BUTTON_AGENT_MENU' : 'BUTTON_REGISTER_AGENT')
-	])
-
-    buttons.push([ 
-		ctx.getTitle(isAlpinist ? 'BUTTON_ALPINIST_MENU' : 'BUTTON_REGISTER_ALPINIST')
-	])
-
-	return Markup.keyboard(buttons).resize()
-} 
 
 
 
@@ -106,25 +138,6 @@ exports.main_menu_goback_keyboard = (ctx) => Markup.keyboard([
 ], { columns: 1 }).resize()
 
 
-exports.send_location_keyboard = (ctx) => {
-
-    const keyboard =  Markup.keyboard([
-		Markup.button.locationRequest(ctx.getTitle("SEND_LOCATION_BUTTON")),	
-		ctx.getTitle('BUTTON_BACK_USER')
-	])
-
-    return keyboard.resize()
-}
-
-exports.send_location_keyboard_admin = (ctx) => {
-
-    const keyboard =  Markup.keyboard([
-		Markup.button.locationRequest(ctx.getTitle("SEND_LOCATION_BUTTON")),	
-		ctx.getTitle('BUTTON_BACK_ADMIN')
-	])
-
-    return keyboard.resize()
-}
 
 exports.main_menu_back_keyboard = (ctx) => Markup.keyboard([ ctx.getTitle('BUTTON_BACK_USER') ]).resize()
 

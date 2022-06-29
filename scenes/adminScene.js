@@ -23,6 +23,8 @@ adminScene.enter(async ctx=>{
 })
 
 
+adminScene.hears(titles.getValues('BUTTON_CHANGE_TEXT'), ctx => ctx.scene.enter('changeTextScene', { main_menu_button }))
+
 
 adminScene.hears(titles.getValues('BUTTON_CATEGORIES'), ctx => ctx.scene.enter('categoriesScene', { main_menu_button }))
 

@@ -8,7 +8,7 @@ const store = require('../store')
 const clientScene = new CustomWizardScene('clientScene')
 .enter(async ctx=>{
 
-    const { edit, random } = ctx.scene.state
+    const { edit } = ctx.scene.state
 
     const connection = await tOrmCon
 
@@ -20,12 +20,11 @@ const clientScene = new CustomWizardScene('clientScene')
             ctx.replyWithTitle("DB_ERROR")
         }))
 
-    userObj = userObj?.[0]
+        ctx.scene.state.userObj = userObj = userObj?.[0]
 
     if (!userObj) {
 
-        ctx.replyWithKeyboard("GREETING",'main_menu_back_keyboard')
-
+        ctx.replyWithPhoto(ctx.getTitle('GREETING_PHOTO'), {caption: ctx.getTitle("GREETING")}).catch(e=>{console.log('no photo to send')})
         
         userObj = await connection.getRepository("User")
         .save({id: ctx.from.id})
@@ -34,8 +33,8 @@ const clientScene = new CustomWizardScene('clientScene')
             ctx.replyWithTitle("DB_ERROR")
         })
     }
-    
-    if (userObj?.userId) await ctx.replyWithKeyboard("#", {name: 'custom_bottom_keyboard', args: [[['ADMIN_SCENE_BUTTON']]]})
+
+    if (userObj?.userId) {}// await ctx.replyWithKeyboard("#", {name: 'main_menu_bottom_keyboard', args: [true]})
     else if (userObj?.loginAgo!=="0") {
         await connection.query(
             "UPDATE channels.users u SET lastUse = now() WHERE id = ?", 
@@ -45,40 +44,15 @@ const clientScene = new CustomWizardScene('clientScene')
             ctx.replyWithTitle("DB_ERROR")
         })
     }
-
-    if (random) {
-        const link = store.getAllRandomLink();
-
-        const cNameExec = /^https\:\/\/t.me\/(.+)$/g.exec(link?.trim());
-
-        const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
-
-        if (edit && !userObj?.userId) return ctx.editMenu(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
-        return ctx.replyWithKeyboard(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
-
-    }
     //console.log(store.getAllRandomLink())
     const keyboard =  'main_menu_keyboard'//{name: 'main_menu_keyboard', args: [store.getAllRandomLink(),userObj?.userId]};
-    if (edit && !userObj?.userId) return ctx.editMenu("HOME_MENU", keyboard)
-    await ctx.replyWithKeyboard("HOME_MENU",keyboard)
+    if (edit && !userObj?.userId) return ctx.editMenu("HOME_MENU",{name: 'main_menu_bottom_keyboard', args: [userObj?.userId]})
+    await ctx.replyWithKeyboard("HOME_MENU",{name: 'main_menu_bottom_keyboard', args: [userObj?.userId]})
     
     
 })	
 
-clientScene.action('random_link', async ctx => {
-    ctx.answerCbQuery().catch(console.log);
 
-    const link = store.getAllRandomLink();
-
-    const cNameExec = /^https\:\/\/t.me\/(.+)$/g.exec(link?.trim());
-
-    console.log(cNameExec, link)
-
-    const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
-
-    ctx.scene.state.temp_post = await ctx.editMenu(ctx.getTitle('ITEM_CARD',[cTitle]), {name: 'item_keyboard_main', args: [link]})
-    
-})
 
 clientScene.action('hide', async ctx => {
     ctx.answerCbQuery().catch(console.log);
@@ -102,6 +76,18 @@ clientScene.action('admin_menu',ctx=>{
     ctx.scene.enter('adminScene', {edit: true});
 })
 
+
+
+clientScene.hears(titles.getTitle('BUTTON_RANDOM','ru'), ctx=>{
+    const {userObj} = ctx.scene.state
+    ctx.scene.enter('catalogScene', {edit: false, random: true, userObj});
+})
+
+clientScene.hears(titles.getTitle('BUTTON_CATEGORIES','ru'), ctx=>{
+    const {userObj} = ctx.scene.state
+
+    ctx.scene.enter('catalogScene', {edit: false,userObj});
+})
 
 clientScene.hears(titles.getTitle('ADMIN_SCENE_BUTTON','ru'), ctx=>{
     ctx.scene.enter('adminScene')//.catch(e=>ctx.replyWithTitle(`Нет такой сцены`));
