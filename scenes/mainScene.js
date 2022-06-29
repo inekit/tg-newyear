@@ -24,7 +24,7 @@ const clientScene = new CustomWizardScene('clientScene')
 
     if (!userObj) {
 
-        await ctx.replyWithPhoto(ctx.getTitle('GREETING_PHOTO'), {caption: ctx.getTitle("GREETING")}).catch(e=>{
+        await ctx.replyWithPhoto(ctx.getTitle('GREETING_PHOTO'), {caption: ctx.getTitle("GREETING")}).catch(async e=>{
             console.log('no photo to send');
             await ctx.replyWithTitle("GREETING");
         })
