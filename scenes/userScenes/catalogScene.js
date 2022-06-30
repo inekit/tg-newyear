@@ -9,8 +9,6 @@ const { CustomWizardScene} = require('telegraf-steps-engine');
 const store = require('../../store')
 const totalStr = 'Все каналы '+ store.getCount();
 
-
-
 const scene = new CustomWizardScene('catalogScene')
 .enter(async ctx => {
 
@@ -84,7 +82,10 @@ scene.hears(store.getCategoriesWithCountStr(), async ctx=>{
 
     const cTitle = cNameExec?.[1] ? '@'+cNameExec[1] : link
 
-    await ctx.replyWithKeyboard("CATEGORY_ADD_TITLE",{name: 'main_menu_bottom_keyboard', args: [ctx.scene.state?.userObj?.userId]})
+    const isAdmin = await require('../../Utils/authAdmin')(ctx.from.id, true)
+    .catch(()=>{ })
+
+    await ctx.replyWithKeyboard("CATEGORY_ADD_TITLE",{name: 'main_menu_bottom_keyboard', args: [isAdmin]})
 
     ctx.scene.state.temp_post = await ctx.replyWithKeyboard(ctx.getTitle('ITEM_CARD_CATEGORY', [cTitle, category_name ?? "Все каналы",store.getCount(category_name)]), {name: 'item_keyboard', args: [link, category_name]})
     

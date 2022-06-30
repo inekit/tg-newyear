@@ -82,14 +82,11 @@ clientScene.action('admin_menu',ctx=>{
 
 
 clientScene.hears(titles.getTitle('BUTTON_RANDOM','ru'), ctx=>{
-    const {userObj} = ctx.scene.state
-    ctx.scene.enter('catalogScene', {edit: false, random: true, userObj});
+    ctx.scene.enter('catalogScene', {edit: false, random: true});
 })
 
 clientScene.hears(titles.getTitle('BUTTON_CATEGORIES','ru'), ctx=>{
-    const {userObj} = ctx.scene.state
-
-    ctx.scene.enter('catalogScene', {edit: false,userObj});
+    ctx.scene.enter('catalogScene', {edit: false});
 })
 
 clientScene.hears(titles.getTitle('ADMIN_SCENE_BUTTON','ru'), ctx=>{
