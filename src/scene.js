@@ -5,10 +5,14 @@ const CustomContextWizard = require("./context")
 const {Step, Steps} = require('./steps')
 const replyTemplates = require('./replyTemplates');
 
+
+const { compose } = Composer
+
+
 module.exports = class CustomWizardScene
   extends BaseScene{
   //constructor(id, ...steps)
-  constructor(id,options,...steps) {
+  constructor(id, options,...steps) {
     let opts;
     let s;
     if (typeof options === 'function' || (options?.isArray() && 'middleware' in options)) {
@@ -19,10 +23,12 @@ module.exports = class CustomWizardScene
       s = steps
     }
     super(id, opts)
-    console.log()
-    this.steps = new Steps(s)
-   
-    
+    this.steps = new Steps(s)    
+  }
+
+  enter(...fns) {
+    this.enterHandler = compose([this.enterHandler, ...fns])
+    return this
   }
 
   getLength = ()=>this.steps.length
@@ -70,7 +76,7 @@ addHandler = (handler) => {
     
     //const nextStepInfo = this.steps.getStepDataById(cursor)
 
-    console.log(keyboard)
+    //console.log(keyboard)
 
     const {kbTop, kbBottom} = ctx.initKeyboards(keyboard)
   
@@ -122,14 +128,19 @@ addHandler = (handler) => {
   }
 
   enterMiddleware() {
-  if (this.enterHandler.toString().length === 21) this.enterHandler = (async (ctx,next) => {
+  const replyFirst = (ctx,next)=>{
     
     ctx.state.name = ctx.scene?.options?.defaultSession?.current
 
     this.replyStep(ctx, 0); 
     next();
-  })
-    return Composer.compose([this.enterHandler , this.middleware()])
+  }
+  const enterAndReply=async (ctx,next)=>{
+    await this.enterHandler(ctx)
+    await replyFirst(ctx,next);
+  }
+  if (this.enterHandler.toString().length === 21) this.enterHandler = (async (ctx,next) => replyFirst())
+    return Composer.compose([enterAndReply,this.middleware()])
   }
 }
 

@@ -2,12 +2,14 @@ const { Middleware, Context, Composer, Telegraf } =  require("telegraf");
 const replyTemplates = require('./replyTemplates')
 const actions = require('./middlewares/actions');
 const { stringify } = require("querystring");
+const {initKeyboards, sendInputReply, deleteMessage} = require("./middlewares/middlewares")
+const titles = require('./middlewares/titles')
 
 class Step {
     constructor(obj){
         if (typeof obj === 'function') return Object.assign(this,{type: 'handler', handler_template: obj})
         
-        const { variable, header, keyboard, type, handler, confines, next, confirm_header, skipTo, skipText, cb, options } = obj
+        const { variable, header, keyboard, type, handler, confines, next, confirm_header, skipTo, skipText, cb, options,autoNext } = obj
 
         Object.assign(this,{
             variable,
@@ -19,6 +21,7 @@ class Step {
             confirm_header,
             next,
             cb,
+            autoNext: autoNext ?? true,
             options: type === 'select' || type === 'menu' ? options : undefined,
             //cursor: this.getLength() + this.startFrom,
             skipTo, skipText
@@ -65,16 +68,19 @@ class Steps{
         return this
     }
 
-    addMenu =  ({ variable, header, options, prefix, cb, confines,skipTo, skipText }, sceneName) => {
-        (async ()=>{
-            const fo = await formatMenuOptions(options, sceneName)
-            this.addStep({type: 'menu',
-                header,
-                keyboard: {name: 'custom_bottom_keyboard', args: [Object.keys(fo)]},
-                options: fo,
-                skipTo, skipText
-            })
-        })()
+    addMenu =  ({ variable, header, options, prefix, cb, confines,skipTo, skipText,autoNext }, sceneName) => {
+
+        const fo = formatMenuOptions(options, sceneName)
+        this.addStep({type: 'menu',
+            variable,
+            header,
+            keyboard: {name: 'custom_bottom_keyboard', args: [Object.keys(fo)]},
+            options: fo,
+            cb,
+            autoNext,
+            skipTo, skipText
+        })
+
         return this
     }
   
@@ -149,9 +155,8 @@ function formatSelectOptions(soArray){
     return Object.values(soArray)
 }
 
-async function formatMenuOptions(soArray, sceneName) {
-    console.log(111, sceneName, await soArray)
-    soArray = await soArray
+function formatMenuOptions(soArray, sceneName) {
+
     if (!(
         typeof soArray === 'object' &&
         soArray !== null
@@ -204,24 +209,52 @@ function  createH (type, stepInfo, nextStepInfo, scene){
     }
 
     if (type==="menu") { 
-        
-        handler.hears(Object.keys(stepInfo.options), ctx=>{
-            ctx.scene.enter(stepInfo.options[ctx.message?.text]).catch(e=>ctx.replyWithTitle(`Нет такой сцены ${stepInfo.options[ctx.message?.text]}`));
+        const optionsTexts = (Object.keys(stepInfo.options))?.map(val=>{
+            return titles.getTitle(val,'ru')
         })
+
+        //console.log(optionsTexts)
+        if (stepInfo.options && stepInfo.cb) handler.hears(optionsTexts, async ctx=>{
+
+            //if (!optionsTexts.includes(ctx.match?.[0])) return;
+            if (!ctx.wizard.state.input) ctx.wizard.state.input = {}
+    
+            ctx.wizard.state.input[stepInfo?.variable] = ctx.message?.text
+    
+            stepInfo?.cb(ctx)
+
+            //const {kbTop, kbBottom} = initKeyboards(nextStepInfo?.keyboard)
+    
+            if (stepInfo?.autoNext) {
+                await sendInputReply(ctx,nextStepInfo?.header, nextStepInfo?.keyboard,nextStepInfo?.keyboard)
+    
+                //ctx.wizard.next()
+            }
+            
+        });
+        else if (stepInfo.options)
+            handler.hears(Object.keys(stepInfo.options), ctx=>{
+                ctx.scene.enter(stepInfo.options[ctx.message?.text]).catch(e=>ctx.replyWithTitle(`Нет такой сцены ${stepInfo.options[ctx.message?.text]}`));
+            })
+        else throw new Error('no opt or cb'); 
         return handler
     }
 
     if (type==="action") { return handler}
 
-    else if (type==="input")
-        handler.on('text', async ctx => 
-        replyTemplates.addSceneInput(
-            ctx, {stepName: stepInfo.variable, 
-                header: nextStepInfo?.header ?? `ENTER_${nextStepInfo?.variable?.toUpperCase()}`, 
-                kbName: nextStepInfo?.keyboard, 
-                confineNames: stepInfo.confines, 
-                sceneName: null
-            }))
+    else if (type==="input") {
+        if (!stepInfo.cb)
+            handler.on('text', async ctx => 
+            replyTemplates.addSceneInput(
+                ctx, {stepName: stepInfo.variable, 
+                    header: nextStepInfo?.header ?? `ENTER_${nextStepInfo?.variable?.toUpperCase()}`, 
+                    kbName: nextStepInfo?.keyboard, 
+                    confineNames: stepInfo.confines, 
+                    sceneName: null
+                }))
+        else handler.on('text',stepInfo.cb)
+    }
+        
 
     else {
         //console.log('cb',stepInfo?.cb)

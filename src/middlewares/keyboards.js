@@ -1,12 +1,11 @@
 const { Markup } = require('telegraf')
 //const store = require('../LocalStorage/store')
 
-exports.custom_bottom_keyboard = (ctx, bNames, columns = 2) => {
+exports.custom_bottom_keyboard = (ctx, bNames, columns = 1) => {
 
     let k=Markup.keyboard([
-	], { columns: 2 }).resize()
+	], { columns  }).resize()
 
-	console.log(bNames)
 	bNames = bNames.reduce((prev, cur, i)=>{
 		if (i%columns===0) {prev.push([ctx.getTitle(cur)]); return prev}
 		else { prev[prev.length-1].push(ctx.getTitle(cur)); return prev}
@@ -17,7 +16,7 @@ exports.custom_bottom_keyboard = (ctx, bNames, columns = 2) => {
     })
 
 
-    return k;
+    return k.resize();
 }
 
 exports.custom_botkeyboard = (ctx, registered) => {
@@ -53,6 +52,17 @@ exports.main_menu_bottom_keyboard = (ctx, isAdmin) => {
 	]
 
 	if (isAdmin) buttons.push([ctx.getTitle('ADMIN_SCENE_BUTTON')])
+
+	return Markup.keyboard(buttons).resize()
+}
+
+exports.confirm_keyboard_bottom = (ctx) => {
+
+	const buttons = [
+		[ 
+			ctx.getTitle('CLIENT_SCENE_BUTTON_CONFIRM_HELP'),
+		],
+	]
 
 	return Markup.keyboard(buttons).resize()
 }
