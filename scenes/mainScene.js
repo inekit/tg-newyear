@@ -79,8 +79,7 @@ const clientScene = new CustomWizardScene("clientScene")
           name: "url_keyboard",
           args: [
             {
-              SUMMER_RECOMENDATIONS:
-                "http://files.dr-flebolog.ru/%D0%9B%D0%B5%D1%82%D0%BD%D0%B8%D0%B5_%D1%80%D0%B5%D0%BA%D0%BE%D0%BC%D0%B5%D0%BD%D0%B4%D0%B0%D1%86%D0%B8%D0%B8_%D1%84%D0%BB%D0%B5%D0%B1%D0%BE%D0%BB%D0%BE%D0%B3%D0%B0.pdf",
+              SUMMER_RECOMENDATIONS: "https://clck.ru/sQurb",
             },
           ],
         });

@@ -9,9 +9,9 @@ const mainStage = new Stage([...require("./scenes/mainScene")], {
   default: "clientScene",
 });
 
-mainStage.on("photo", (ctx) => {
+/*mainStage.on("photo", (ctx) => {
   console.log(ctx.message.photo);
-});
+})*/
 
 mainStage.start(async (ctx) => {
   ctx.scene.enter("clientScene");
