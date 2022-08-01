@@ -28,7 +28,7 @@ console.log("started");
     stages
   );
 
-  if ("production" === "production") {
+  if ("prodction" === "production") {
     bot.catch(console.error);
 
     const secretPath = `/telegraf/${bot.secretPathComponent()}`;

@@ -3,6 +3,9 @@ const CustomContextWizard = require("telegraf-steps-engine/context");
 const dateFormats = ["D.MMMM.YYYY", "DD.MM.YY", "DD.MM.YYYY", "DD.MM.YYYY"];
 const getCurrencies = require("../Utils/getCources");
 const moment = require("moment");
+function numberWithSpaces(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
 
 const clientScene = new CustomWizardScene("clientScene").enter(async (ctx) => {
   const { USD, EUR, KRW } = (ctx.scene.state.currencies =
@@ -61,12 +64,12 @@ clientScene
         return ctx.replyWithTitle("ENTER_TEXT_PRICE");
       if (parseInt(ctx.message.text) < 5000000)
         await ctx.replyWithTitle("TOO_LOW_PRICE", [
-          (
-            parseInt(ctx.message.text) /
-            parseFloat(ctx.scene.state.currencies.KRW)
-          )
-            .toFixed(0)
-            .replace(".", ","),
+          numberWithSpaces(
+            (
+              parseInt(ctx.message.text) /
+              parseFloat(ctx.scene.state.currencies.KRW)
+            ).toFixed(0)
+          ),
         ]);
 
       !ctx.wizard.state.input
@@ -177,7 +180,11 @@ clientScene
   });
 
 function sendSum(ctx) {
-  const { USD, EUR, KRW } = ctx.scene.state.currencies;
+  let { USD, EUR, KRW } = ctx.scene.state.currencies;
+
+  USD = USD.replace(",", ".");
+  EUR = EUR.replace(",", ".");
+  KRW = KRW.replace(",", ".");
 
   let { price, volume, age, date_register } = ctx.wizard.state.input;
 
@@ -239,6 +246,7 @@ function sendSum(ctx) {
       .reverse()
       .forEach(([maxVolume, price]) => {
         if (parseInt(volume) <= maxVolume) tax = price * parseInt(volume);
+        console.log(tax, parseInt(volume) <= maxVolume);
       });
   } else {
     const prices = {
@@ -283,12 +291,13 @@ function sendSum(ctx) {
 
   console.log(parseInt(parseInt(usdPrice).toFixed(0)));
 
-  const taxRub = Math.round(tax * parseFloat(EUR) * 1000) / 1000;
+  const taxRub = (tax * parseFloat(EUR)).toFixed(0);
 
-  const sum =
-    parseInt(parseInt(rubPrice).toFixed(0)) +
-    taxRub +
-    sbor +
+  console.log(taxRub);
+  const sum = (
+    parseInt(rubPrice) +
+    parseInt(taxRub) +
+    parseInt(sbor) +
     utilSbor +
     300 * parseFloat(USD) +
     250 * parseFloat(USD) +
@@ -296,19 +305,20 @@ function sendSum(ctx) {
     3000 +
     20000 +
     1270 * parseFloat(USD) +
-    150000;
+    150000
+  ).toFixed(0);
 
   ctx.replyWithTitle("SUM_MESSAGE", [
     KRW,
     USD,
     EUR,
-    rubPrice,
-    usdPrice,
-    invoiceSum,
-    taxRub,
-    sbor,
-    utilSbor,
-    sum,
+    numberWithSpaces(rubPrice),
+    numberWithSpaces(usdPrice),
+    numberWithSpaces(invoiceSum),
+    numberWithSpaces(taxRub),
+    numberWithSpaces(sbor),
+    numberWithSpaces(utilSbor),
+    numberWithSpaces(sum),
   ]);
 }
 
