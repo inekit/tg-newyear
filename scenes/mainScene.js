@@ -4,15 +4,56 @@ const dateFormats = ["D.MMMM.YYYY", "DD.MM.YY", "DD.MM.YYYY", "DD.MM.YYYY"];
 const getCurrencies = require("../Utils/getCources");
 const moment = require("moment");
 
-const clientScene = new CustomWizardScene("clientScene")
-  .enter(async (ctx) => {
-    const { USD, EUR, KRW } = (ctx.scene.state.currencies =
-      await getCurrencies());
+const clientScene = new CustomWizardScene("clientScene").enter(async (ctx) => {
+  const { USD, EUR, KRW } = (ctx.scene.state.currencies =
+    await getCurrencies());
 
-    delete ctx.wizard.state.input;
+  delete ctx.wizard.state.input;
 
-    ctx.replyWithTitle("START_TITLE", [KRW, USD, EUR]);
-  })
+  ctx.replyWithTitle("START_TITLE", [KRW, USD, EUR]);
+});
+
+clientScene.command("price", async (ctx) => {
+  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
+
+  await ctx.replyWithTitle("ENTER_PRICE");
+
+  ctx.wizard.selectStep(0);
+});
+
+clientScene.command("volume", (ctx) => {
+  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
+
+  if (ctx.wizard.cursor === 2) ctx.replyStep(1);
+  else ctx.replyStep(ctx.wizard.cursor);
+});
+
+clientScene.command("age", (ctx) => {
+  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
+
+  if (ctx.wizard.cursor === 2) ctx.replyStep(2);
+  else ctx.replyStep(ctx.wizard.cursor);
+});
+
+clientScene.command("krw", async (ctx) => {
+  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
+
+  ctx.replyStep(5);
+});
+
+clientScene.command("eur", (ctx) => {
+  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
+
+  ctx.replyStep(4);
+});
+
+clientScene.command("usd", (ctx) => {
+  if (!ctx.scene.state.currencies) return; //ctx.scene.reenter();
+
+  ctx.replyStep(3);
+});
+
+clientScene
   .addStep({
     variable: "price",
     cb: async (ctx) => {
@@ -24,7 +65,7 @@ const clientScene = new CustomWizardScene("clientScene")
             parseInt(ctx.message.text) /
             parseFloat(ctx.scene.state.currencies.KRW)
           )
-            .toFixed(3)
+            .toFixed(0)
             .replace(".", ","),
         ]);
 
@@ -54,7 +95,7 @@ const clientScene = new CustomWizardScene("clientScene")
       "3800 см3": "3800",
       Электромобиль: "0",
     },
-    cb: (ctx) => {
+    cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
       ctx.wizard.state.input.volume = ctx.match[0];
@@ -82,7 +123,7 @@ const clientScene = new CustomWizardScene("clientScene")
 
       sendSum(ctx);
     },
-    cb: (ctx) => {
+    cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
       ctx.wizard.state.input.age = ctx.match[0];
@@ -92,37 +133,46 @@ const clientScene = new CustomWizardScene("clientScene")
   .addStep({
     variable: "usd",
     cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+      if (parseFloat(ctx.message.text) != ctx.message.text)
+        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
 
       ctx.scene.state.currencies.USD = ctx.message.text;
-      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
         return sendSum(ctx);
-      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
-      ctx.replyNextStep();
+      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
+      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
+      ctx.replyWithTitle("ENTER_PRICE");
+      ctx.wizard.selectStep(0);
     },
   })
   .addStep({
     variable: "eur",
     cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+      if (parseFloat(ctx.message.text) != ctx.message.text)
+        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
 
       ctx.scene.state.currencies.EUR = ctx.message.text;
-      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
         return sendSum(ctx);
-      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
-      ctx.replyNextStep();
+      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
+      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
+      ctx.replyWithTitle("ENTER_PRICE");
+      ctx.wizard.selectStep(0);
     },
   })
   .addStep({
     variable: "krw",
     cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+      if (parseFloat(ctx.message.text) != ctx.message.text)
+        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
 
       ctx.scene.state.currencies.KRW = ctx.message.text;
-      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
         return sendSum(ctx);
-      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
-      ctx.replyNextStep();
+      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
+      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
+      ctx.replyWithTitle("ENTER_PRICE");
+      ctx.wizard.selectStep(0);
     },
   });
 
@@ -137,18 +187,14 @@ function sendSum(ctx) {
 
   console.log(ctx.wizard.state.input, price, parseFloat(KRW));
 
-  const rubPrice = (parseInt(price) / parseFloat(KRW))
-    .toFixed(3)
-    .replace(".", ",");
+  const rubPrice = (parseInt(price) / parseFloat(KRW)).toFixed(0);
 
-  const usdPrice = (parseFloat(rubPrice) / parseFloat(USD))
-    .toFixed(3)
-    .replace(".", ",");
+  const usdPrice = (parseFloat(rubPrice) / parseFloat(USD)).toFixed(0);
 
-  const eurPrice = parseFloat(rubPrice) / parseFloat(EUR);
+  const eurPrice = (parseFloat(rubPrice) / parseFloat(EUR)).toFixed(0);
 
   if (date_register) {
-    const date = moment(ctx.message.text, dateFormats, true);
+    const date = moment(ctx.message?.text, dateFormats, true);
     const now = moment();
     age = now.diff(date, "year");
     console.log(age);
@@ -156,8 +202,6 @@ function sendSum(ctx) {
   }
 
   const utilSbor = age !== "0" ? 5300 : 3400;
-
-  let tax;
 
   if (age === "0") {
     console.log(eurPrice);
@@ -213,19 +257,38 @@ function sendSum(ctx) {
       });
   }
 
-  const invoiceSum = (
-    parseInt(parseInt(usdPrice).toFixed(0)) +
-    parseFloat(USD) +
-    parseFloat(USD) +
-    parseFloat(USD)
-  ).toFixed(0);
+  let sbor;
+
+  const prices = {
+    200000: 775,
+    450000: 1550,
+    1200000: 3100,
+    2700000: 8530,
+    4200000: 12000,
+    5500000: 15500,
+    7000000: 20000,
+    8000000: 23000,
+    9000000: 25000,
+    10000000: 27000,
+    10000000000: 30000,
+  };
+
+  Object.entries(prices)
+    .reverse()
+    .forEach(([maxPrice, price]) => {
+      if (parseInt(rubPrice) <= maxPrice) sbor = price;
+    });
+
+  const invoiceSum = (parseInt(usdPrice) + 300 + 250 + 1270).toFixed(0);
+
+  console.log(parseInt(parseInt(usdPrice).toFixed(0)));
 
   const taxRub = Math.round(tax * parseFloat(EUR) * 1000) / 1000;
 
   const sum =
     parseInt(parseInt(rubPrice).toFixed(0)) +
     taxRub +
-    775 +
+    sbor +
     utilSbor +
     300 * parseFloat(USD) +
     250 * parseFloat(USD) +
@@ -239,41 +302,14 @@ function sendSum(ctx) {
     KRW,
     USD,
     EUR,
-    rubPrice.toFixed(0),
-    usdPrice.toFixed(0),
+    rubPrice,
+    usdPrice,
     invoiceSum,
     taxRub,
+    sbor,
     utilSbor,
     sum,
   ]);
 }
-
-clientScene.command("price", async (ctx) => {
-  await ctx.replyWithTitle("ENTER_PRICE");
-
-  ctx.wizard.selectStep(0);
-});
-
-clientScene.command("volume", (ctx) => {
-  if (ctx.wizard.cursor === 2) ctx.replyStep(1);
-  else ctx.replyStep(ctx.wizard.cursor);
-});
-
-clientScene.command("age", (ctx) => {
-  if (ctx.wizard.cursor === 2) ctx.replyStep(2);
-  else ctx.replyStep(ctx.wizard.cursor);
-});
-
-clientScene.command("krw", async (ctx) => {
-  ctx.replyStep(3);
-});
-
-clientScene.command("eur ", (ctx) => {
-  ctx.replyStep(3);
-});
-
-clientScene.command("usd", (ctx) => {
-  ctx.replyStep(3);
-});
 
 module.exports = [clientScene];
