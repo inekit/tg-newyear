@@ -4,6 +4,7 @@
     "axios": "^0.27.2",
     "edit-json-file": "^1.7.0",
     "elasticsearch": "^16.7.3",
+    "fs": "^0.0.1-security",
     "moment": "^2.29.3",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
