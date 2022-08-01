@@ -174,10 +174,10 @@ function sendSum(ctx) {
   }
 
   const invoiceSum =
-    parseInt(parseInt(rubPrice).toFixed(0)) +
-    300 * parseFloat(USD) +
-    250 * parseFloat(USD) +
-    1270 * parseFloat(USD);
+    parseInt(parseInt(usdPrice).toFixed(0)) +
+    parseFloat(USD) +
+    parseFloat(USD) +
+    parseFloat(USD);
 
   const taxRub = Math.round(tax * parseFloat(EUR) * 1000) / 1000;
 
