@@ -55,6 +55,8 @@ const clientScene = new CustomWizardScene("clientScene")
       Электромобиль: "0",
     },
     cb: (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
       ctx.wizard.state.input.volume = ctx.match[0];
 
       if (ctx.wizard.state.input.age) return sendSum(ctx);
@@ -81,8 +83,46 @@ const clientScene = new CustomWizardScene("clientScene")
       sendSum(ctx);
     },
     cb: (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
       ctx.wizard.state.input.age = ctx.match[0];
       sendSum(ctx);
+    },
+  })
+  .addStep({
+    variable: "usd",
+    cb: (ctx) => {
+      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+
+      ctx.scene.state.currencies.USD = ctx.message.text;
+      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+        return sendSum(ctx);
+      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
+      ctx.replyNextStep();
+    },
+  })
+  .addStep({
+    variable: "eur",
+    cb: (ctx) => {
+      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+
+      ctx.scene.state.currencies.EUR = ctx.message.text;
+      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+        return sendSum(ctx);
+      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
+      ctx.replyNextStep();
+    },
+  })
+  .addStep({
+    variable: "krw",
+    cb: (ctx) => {
+      if (parseFloat(ctx.message.text) != ctx.message.text) return;
+
+      ctx.scene.state.currencies.KRW = ctx.message.text;
+      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+        return sendSum(ctx);
+      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
+      ctx.replyNextStep();
     },
   });
 
@@ -173,11 +213,12 @@ function sendSum(ctx) {
       });
   }
 
-  const invoiceSum =
+  const invoiceSum = (
     parseInt(parseInt(usdPrice).toFixed(0)) +
     parseFloat(USD) +
     parseFloat(USD) +
-    parseFloat(USD);
+    parseFloat(USD)
+  ).toFixed(0);
 
   const taxRub = Math.round(tax * parseFloat(EUR) * 1000) / 1000;
 
@@ -198,8 +239,8 @@ function sendSum(ctx) {
     KRW,
     USD,
     EUR,
-    rubPrice,
-    usdPrice,
+    rubPrice.toFixed(0),
+    usdPrice.toFixed(0),
     invoiceSum,
     taxRub,
     utilSbor,
@@ -221,6 +262,18 @@ clientScene.command("volume", (ctx) => {
 clientScene.command("age", (ctx) => {
   if (ctx.wizard.cursor === 2) ctx.replyStep(2);
   else ctx.replyStep(ctx.wizard.cursor);
+});
+
+clientScene.command("krw", async (ctx) => {
+  ctx.replyStep(3);
+});
+
+clientScene.command("eur ", (ctx) => {
+  ctx.replyStep(3);
+});
+
+clientScene.command("usd", (ctx) => {
+  ctx.replyStep(3);
 });
 
 module.exports = [clientScene];
