@@ -17,19 +17,6 @@ mainStage.start(async (ctx) => {
   ctx.scene.enter("clientScene");
 });
 
-mainStage.hears(titles.getValues("BUTTON_BACK_ADMIN"), (ctx) =>
-  ctx.scene.enter("adminScene")
-);
-mainStage.hears(titles.getValues("BUTTON_ADMIN_MENU"), (ctx) =>
-  ctx.scene.enter("adminScene")
-);
-mainStage.hears(titles.getValues("BUTTON_BACK_USER"), (ctx) =>
-  ctx.scene.enter("clientScene")
-);
-mainStage.hears(titles.getValues("BUTTON_ABOUT"), (ctx) =>
-  ctx.replyWithKeyboard("HOME_MENU")
-);
-
 const stages = new Composer();
 stages.use(mainStage.middleware());
 

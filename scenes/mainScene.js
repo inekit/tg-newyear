@@ -1,327 +1,219 @@
-const {
-  Telegraf,
-  Composer,
-  Scenes: { WizardScene },
-  Telegram,
-} = require("telegraf");
-
 const { CustomWizardScene, titles } = require("telegraf-steps-engine");
-const {
-  custom_keyboard,
-} = require("telegraf-steps-engine/middlewares/inlineKeyboards");
-const { confirmDialog } = require("telegraf-steps-engine/replyTemplates");
-const clinics = require("../clinics.json");
-const store = require("../store");
-const timeOutPromise = (cb, timeout) =>
-  new Promise((res, rej) => {
-    try {
-      setTimeout(async () => {
-        res(await cb());
-      }, timeout);
-    } catch {
-      (e) => {
-        rej(e);
-      };
-    }
-  });
+const CustomContextWizard = require("telegraf-steps-engine/context");
+const dateFormats = ["D.MMMM.YYYY", "DD.MM.YY", "DD.MM.YYYY", "DD.MM.YYYY"];
+const getCurrencies = require("../Utils/getCources");
+const moment = require("moment");
 
 const clientScene = new CustomWizardScene("clientScene")
   .enter(async (ctx) => {
-    const f_name =
-      ctx.from?.first_name ?? ctx.from?.username ?? "Дорогой клиент";
-    console.log(f_name);
-    await ctx
-      .replyWithPhoto(ctx.getTitle("GREETING_PHOTO"), {
-        caption: ctx.getTitle("GREETING", [f_name]),
-      })
-      .catch(async (e) => {
-        ctx.replyWithTitle("GREETING", [f_name]);
-      });
-  })
-  .addMenu({
-    variable: "age",
-    options: ["less_35", "3550", "more_50"],
-    cb: (ctx) => {
-      ctx.wizard.next();
-    },
-  })
-  .addMenu({
-    variable: "frequency",
-    options: ["never", "rarely", "often"],
-    cb: async (ctx) => {
-      await ctx
-        .replyWithPhoto(ctx.getTitle("STARS_PHOTO"))
-        .catch(async (e) => {});
-      ctx.wizard.next();
-    },
-  })
-  .addMenu({
-    variable: "stars",
-    options: ["none", "stars", "knots", "all"],
-    cb: (ctx) => {
-      ctx.wizard.next();
-    },
-  })
-  .addMenu({
-    variable: "heredity",
-    options: ["no", "yes"],
-    autoNext: false,
-    cb: async (ctx) => {
-      await ctx.telegram.sendMessage(ctx.chat.id, ctx.getTitle("TEST_ENDED"), {
-        reply_markup: { remove_keyboard: true },
-      });
+    const { USD, EUR, KRW } = (ctx.scene.state.currencies =
+      await getCurrencies());
 
-      await timeOutPromise(async () => {
-        await ctx
-          .replyWithPhoto(ctx.getTitle("MEMO_PHOTO"))
-          .catch(async (e) => {});
-        await ctx.replyWithKeyboard("MEMO", {
-          name: "url_keyboard",
-          args: [
-            {
-              SUMMER_RECOMENDATIONS: "https://clck.ru/sQurb",
-            },
-          ],
-        });
-      }, 1000);
+    delete ctx.wizard.state.input;
 
-      const certificateId = store.createCertificate(ctx.from?.id);
-
-      const f_name =
-        ctx.from?.first_name ?? ctx.from?.username ?? "Дорогой клиент";
-      const rate = Object.values(ctx.wizard.state.input)?.reduce(
-        (prev, el) => (prev += +el[0]),
-        0
-      );
-
-      if (rate <= 4) {
-        await timeOutPromise(async () => {
-          await ctx.replyWithTitle("RESULTS_WELL", [f_name]);
-        }, 1000);
-
-        await timeOutPromise(async () => {
-          await ctx.replyWithKeyboard("WHAT_IS", {
-            name: "url_keyboard",
-            args: [{ WATCH_WEBINAR: "http://youtu.be/X607VwydagQ" }],
-          });
-        }, 5000);
-
-        await timeOutPromise(async () => {
-          await ctx
-            .replyWithPhoto(ctx.getTitle("SERTIFICATE_PHOTO"), {
-              caption: ctx.getTitle("SERTIFICATE", [certificateId]),
-            })
-            .catch(async (e) => {
-              await ctx.replyWithTitle("SERTIFICATE", [certificateId]);
-            });
-        }, 5000);
-
-        await ctx.replyWithKeyboard(
-          "SERTIFICATE_ATTENTION",
-          {
-            name: "url_keyboard",
-            args: [
-              { CHOOSE_DOCTOR: "http://dr-flebolog.ru/?utm_term=telegrambot" },
-            ],
-          },
-          [certificateId]
-        );
-
-        return ctx.wizard.next();
-      }
-
-      await timeOutPromise(async () => {
-        await ctx.replyWithTitle("RESULTS_BAD", [f_name]);
-      }, 1000);
-
-      await timeOutPromise(async () => {
-        await ctx
-          .replyWithPhoto(ctx.getTitle("SERTIFICATE_PHOTO"))
-          .catch(async (e) => {});
-        await ctx.replyNextStep();
-
-        await timeOutPromise(async () => {
-          if (!ctx.wizard.state.input?.city)
-            await ctx.replyWithTitle("ENTER_CITY_AGAIN");
-        }, 10000);
-      }, 3000);
-    },
-  })
-  .addMenu({
-    variable: "city",
-    options: [
-      "Волгоград",
-      "Астрахань",
-      "Владикавказ",
-      "Нальчик",
-      "Ставрополь",
-      "Краснодар",
-      "Тамбов",
-    ],
-    autoNext: false,
-    cb: async (ctx) => {
-      await ctx.telegram.sendMessage(ctx.chat.id, ctx.getTitle("ENTER_PHONE"), {
-        reply_markup: { remove_keyboard: true },
-      });
-
-      ctx.wizard.next();
-
-      await timeOutPromise(async () => {
-        if (!ctx.wizard.state.input?.phone)
-          await ctx.replyWithTitle("ENTER_PHONE_AGAIN");
-      }, 10000);
-
-      await timeOutPromise(async () => {
-        if (!ctx.wizard.state.input?.phone)
-          await ctx.replyWithTitle("ENTER_PHONE_AGAIN2");
-      }, 10000);
-
-      await timeOutPromise(async () => {
-        if (!ctx.wizard.state.input?.phone) {
-          const f_name =
-            ctx.from?.first_name ?? ctx.from?.username ?? "Дорогой клиент";
-
-          ctx.wizard.state.contacts_changed = true;
-          await ctx.replyWithTitle("CONSULT_AGAIN", [f_name]);
-        }
-      }, 10000);
-    },
+    ctx.replyWithTitle("START_TITLE", [KRW, USD, EUR]);
   })
   .addStep({
-    variable: "phone",
-    autoNext: false,
+    variable: "price",
     cb: async (ctx) => {
-      ctx.wizard.state.input.phone = ctx.message?.text;
-
-      if (
-        !/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/.test(
-          ctx.wizard.state.input.phone
-        )
-      )
-        return ctx.replyWithTitle("WRONG_PHONE_FORMAT");
-
-      const full_name = ctx.from?.first_name
-        ? ctx.from?.last_name
-          ? `${ctx.from?.last_name} ${ctx.from?.first_name}`
-          : ctx.from?.first_name
-        : ctx.from?.username ?? "Не указано";
-
-      if (ctx.wizard.state.contacts_changed) {
-        ctx.wizard.next().next();
-        return ctx.replyWithKeyboard(
-          "CONTACTS_CHANGED",
-          {
-            name: "custom_bottom_keyboard",
-            args: [["CLIENT_SCENE_BUTTON_HELP_C"]],
-          },
-          [full_name, ctx.wizard.state.input.phone]
-        );
-      }
-
-      await ctx.replyWithKeyboard("STEPS", {
-        name: "url_keyboard",
-        args: [
-          {
-            HOW: "https://www.youtube.com/watch?v=IqdQ0_zUJbU",
-            ALL_ABOUT: "http://youtu.be/X607VwydagQ",
-          },
-        ],
-      });
-
-      const certificateId = store.getCertificate(ctx.from?.id);
-
-      await timeOutPromise(async () => {
-        await ctx
-          .replyWithPhoto(ctx.getTitle("SERTIFICATE_PHOTO"), {
-            caption: ctx.getTitle("SERTIFICATE_WITH_CITY", [certificateId]),
-          })
-          .catch(async (e) => {
-            await ctx.replyWithTitle("SERTIFICATE_WITH_CITY", [certificateId]);
-          });
-      }, 2000);
-
-      const clinic = clinics?.[ctx.wizard.state.input.city];
-      const doctors = clinic?.doctors;
-
-      await timeOutPromise(async () => {
-        await ctx.replyWithTitle("DOCTORS", [
-          ctx.wizard.state.input.city?.toLowerCase(),
-          clinic?.address,
+      if (parseInt(ctx.message.text) != ctx.message.text)
+        return ctx.replyWithTitle("ENTER_TEXT_PRICE");
+      if (parseInt(ctx.message.text) < 5000000)
+        await ctx.replyWithTitle("TOO_LOW_PRICE", [
+          (
+            parseInt(ctx.message.text) /
+            parseFloat(ctx.scene.state.currencies.KRW)
+          )
+            .toFixed(3)
+            .replace(".", ","),
         ]);
-        //{name: 'url_keyboard', args: [{'CLINIC': 'https://www.youtube.com/watch?v=IqdQ0_zUJbU'}]}
-      }, 2000);
 
-      await timeOutPromise(async () => {
-        for (doctor of doctors) {
-          await ctx
-            .replyWithPhoto(doctor.photo, {
-              caption: ctx.getTitle("DOCTOR_TOP", [
-                doctor.profile,
-                doctor.stage,
-              ]),
-            })
-            .catch(async (e) => {
-              await ctx.replyWithTitle("DOCTOR_TOP", [
-                doctor.profile,
-                doctor.stage,
-              ]);
-            })
-            .finally(async () => {
-              await ctx.replyWithKeyboard(
-                ctx.getTitle("DOCTOR_BOTTOM", [doctor.name, doctor.phone]),
-                {
-                  name: "url_keyboard",
-                  args: [{ DOCTOR_APPOINTMENT: clinic?.link }],
-                  //[{'DOCTOR_CHANNEL': clinic?.link, 'DOCTOR_REVIEWS': clinic?.link, 'DOCTOR_APPOINTMENT': clinic?.link}]
-                }
-              );
-            });
-        }
+      !ctx.wizard.state.input
+        ? (ctx.wizard.state.input = { price: ctx.message.text })
+        : (ctx.wizard.state.input.price = ctx.message.text);
 
-        await timeOutPromise(async () => {
-          await ctx.wizard.next();
-          ctx.replyWithKeyboard(
-            "FINAL_TITLE",
-            {
-              name: "custom_bottom_keyboard",
-              args: [["CLIENT_SCENE_BUTTON_HELP"]],
-            },
-            [certificateId]
-          );
-        }, 1000);
-      }, 1000);
+      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
+        return sendSum(ctx);
+      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
+      ctx.replyNextStep();
     },
   })
-  .addMenu({
-    options: ["help"],
-    autoNext: false,
+  .addSelect({
+    variable: "volume",
+    options: {
+      "1000 см3": "1000",
+      "1200 см3": "1200",
+      "1500 см3": "1500",
+      "1600 см3": "1600",
+      "2000 см3": "2000",
+      "2200 см3": "2200",
+      "2500 см3": "2500",
+      "3000 см3": "3000",
+      "3300 см3": "3300",
+      "3500 см3": "3500",
+      "3800 см3": "3800",
+      Электромобиль: "0",
+    },
     cb: (ctx) => {
-      console.log(ctx.wizard.state?.input);
-      ctx.replyWithKeyboard(
-        ctx.getTitle("HELP_APPOINTMENT", [
-          ctx.from?.first_name ?? ctx.from?.username,
-          ctx.wizard.state?.input?.phone,
-        ]),
-        "confirm_keyboard_bottom"
-      );
-      ctx.wizard.next();
+      ctx.wizard.state.input.volume = ctx.match[0];
+
+      if (ctx.wizard.state.input.age) return sendSum(ctx);
+
+      ctx.replyNextStep();
     },
   })
-  .addMenu({
-    options: ["confirm_help", "help_c"],
-    cb: async (ctx) => {
-      ctx.replyWithHTML(ctx.getTitle("HELP_SUCCESS"), {
-        reply_markup: { remove_keyboard: true },
-      });
-      await ctx.telegram.sendMessage(
-        ctx.chat.id,
-        ctx.getTitle("NEW_HELP_APPOINTMENT", [
-          ctx.from?.username,
-          ctx.from?.first_name ?? ctx.from?.username,
-          ctx.wizard.state?.input?.phone,
-        ])
-      );
+  .addSelect({
+    variable: "age",
+    options: {
+      "Младше 3 лет": "0",
+      "От 3 до 5 лет": "3",
+      "Старше 5 лет": "6",
+    },
+    onInput: (ctx) => {
+      const now = moment();
+      const date = moment(ctx.message.text, dateFormats, true);
+
+      if (date >= now || !date.isValid())
+        return ctx.replyWithTitle("ENTER_VALID_DATE");
+
+      ctx.wizard.state.input.date_register = date.toString();
+
+      sendSum(ctx);
+    },
+    cb: (ctx) => {
+      ctx.wizard.state.input.age = ctx.match[0];
+      sendSum(ctx);
     },
   });
+
+function sendSum(ctx) {
+  const { USD, EUR, KRW } = ctx.scene.state.currencies;
+
+  let { price, volume, age, date_register } = ctx.wizard.state.input;
+
+  price = parseInt(price);
+
+  volume = parseInt(volume);
+
+  console.log(ctx.wizard.state.input, price, parseFloat(KRW));
+
+  const rubPrice = (parseInt(price) / parseFloat(KRW))
+    .toFixed(3)
+    .replace(".", ",");
+
+  const usdPrice = (parseFloat(rubPrice) / parseFloat(USD))
+    .toFixed(3)
+    .replace(".", ",");
+
+  const eurPrice = parseFloat(rubPrice) / parseFloat(EUR);
+
+  if (date_register) {
+    const date = moment(ctx.message.text, dateFormats, true);
+    const now = moment();
+    age = now.diff(date, "year");
+    console.log(age);
+    age = age < 3 ? "0" : age.toString();
+  }
+
+  const utilSbor = age !== "0" ? 5300 : 3400;
+
+  let tax;
+
+  if (age === "0") {
+    console.log(eurPrice);
+    const perc = eurPrice > 8499 ? 0.48 : 0.54;
+    const prices = {
+      8500: 2.5,
+      16700: 3.5,
+      42300: 5.5,
+      84500: 7.5,
+      169000: 15,
+      500000000: 20,
+    };
+
+    let volPrice;
+    Object.entries(prices)
+      .reverse()
+      .forEach(([maxSum, price]) => {
+        if (eurPrice <= maxSum) volPrice = price * parseInt(volume);
+      });
+
+    console.log(perc * eurPrice, volPrice);
+
+    tax = Math.max(perc * eurPrice, volPrice);
+  } else if (parseInt(age) <= 5) {
+    const prices = {
+      1000: 1.5,
+      1500: 1.7,
+      1800: 2.5,
+      2300: 2.7,
+      3000: 3,
+      300000: 3.6,
+    };
+
+    Object.entries(prices)
+      .reverse()
+      .forEach(([maxVolume, price]) => {
+        if (parseInt(volume) <= maxVolume) tax = price * parseInt(volume);
+      });
+  } else {
+    const prices = {
+      1000: 3,
+      1500: 3.2,
+      1800: 3.5,
+      2300: 4.8,
+      3000: 5,
+      300000: 5.7,
+    };
+
+    Object.entries(prices)
+      .reverse()
+      .forEach(([maxVolume, price]) => {
+        if (parseInt(volume) <= maxVolume) tax = price * parseInt(volume);
+      });
+  }
+
+  const taxRub = Math.round(tax * parseFloat(EUR) * 1000) / 1000;
+
+  const sum =
+    parseInt(parseInt(rubPrice).toFixed(0)) +
+    taxRub +
+    775 +
+    utilSbor +
+    300 * parseFloat(USD) +
+    250 * parseFloat(USD) +
+    4000 +
+    3000 +
+    20000 +
+    1270 * parseFloat(USD) +
+    150000;
+
+  ctx.replyWithTitle("SUM_MESSAGE", [
+    KRW,
+    USD,
+    EUR,
+    rubPrice,
+    usdPrice,
+    taxRub,
+    utilSbor,
+    sum,
+  ]);
+}
+
+clientScene.command("price", async (ctx) => {
+  await ctx.replyWithTitle("ENTER_PRICE");
+
+  ctx.wizard.selectStep(0);
+});
+
+clientScene.command("volume", (ctx) => {
+  if (ctx.wizard.cursor === 2) ctx.replyStep(1);
+  else ctx.replyStep(ctx.wizard.cursor);
+});
+
+clientScene.command("age", (ctx) => {
+  if (ctx.wizard.cursor === 2) ctx.replyStep(2);
+  else ctx.replyStep(ctx.wizard.cursor);
+});
 
 module.exports = [clientScene];

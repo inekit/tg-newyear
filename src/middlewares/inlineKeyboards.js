@@ -1,409 +1,359 @@
-const { Markup } = require('telegraf')
-//const store = require('../LocalStorage/store')
-//const moment = require('moment')
-const { main_menu_back_keyboard } = require('./keyboards')
-
-const callbackButton = Markup.button.callback
-const urlButton = Markup.button.url
-const { inlineKeyboard } = Markup
-
-
-
-exports.offers_alp_list_keyboard = (ctx, offers) => {
-
-    const keyboard = inlineKeyboard(offers.map(({ order_id, alpinist_id, header }) => callbackButton(header ?? "default", `order-${order_id}-${alpinist_id}`)), { columns: 2 })
-
-    return keyboard
-}
-
-exports.shedle_keyboard = (ctx, shedle) => {
-
-    const keyboard = inlineKeyboard(shedle.map(({ id, header, type }) => 
-    callbackButton(header ?? "default", `${type}-${id}`)), { columns: 2 })
-
-    keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('ADD_SHEDLE_ENTRY'), 'addShedleEntry')]
-    )
-
-    return keyboard
-}
-
-
-
-
-
-exports.city_keyboard = (ctx ) => {
-
-    const keyboard = inlineKeyboard([
-        callbackButton(ctx.getTitle("BUTTON_ADD_POINT"), 'add_point'),
-        callbackButton(ctx.getTitle("BUTTON_POINTS"), 'points'),
-        callbackButton(ctx.getTitle("BUTTON_DELETE"), 'delete'),
-    ], { columns: 2 })
-
-    keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('BUTTON_BACK'), 'back')]
-    )
-
-    return keyboard
-}
-
-exports.confirm_cert_keyboard = (ctx, cert_id) => {
-
-    //console.log(ctx,cert_id)
-
-    const keyboard = inlineKeyboard([
-        callbackButton(ctx.getTitle('BUTTON_APPROVE'), 'approve-'+cert_id),
-    callbackButton(ctx.getTitle('BUTTON_DELETE'), 'delete-'+cert_id),
-    callbackButton(ctx.getTitle('BUTTON_SKIP'), 'skip-'+cert_id),
-])
-
-    return keyboard
-}
-
-exports.claim_keyboard = (ctx, claim_id) => {
-
-    const keyboard = inlineKeyboard([
-        callbackButton(ctx.getTitle('BUTTON_SEND_RES'), 'sendres-'+claim_id),
-    callbackButton(ctx.getTitle('BUTTON_SKIP'), 'skip-'+claim_id),
-])
-
-    return keyboard
-}
-
-
-exports.alpinists_list_keyboard = (ctx, alpinists) => {
-
-    const keyboard = inlineKeyboard(alpinists.map(({ alpinist_id, name }) => callbackButton(name ?? "default", alpinist_id)), { columns: 2 })
-
-    return keyboard
-}
-
-
-exports.admins_actions_keyboard = (ctx ) => {
-
-    const keyboard = inlineKeyboard([
-        callbackButton(ctx.getTitle("BUTTON_ADD_ADMIN"), 'addAdmin'),
-        callbackButton(ctx.getTitle("BUTTON_DELETE_ADMIN"), 'deleteAdmin')
-    ], { columns: 2 })
-
-    return keyboard
-}
-
-exports.change_text_actions_keyboard = (ctx ) => {
-
-    const keyboard = inlineKeyboard([
-        callbackButton(ctx.getTitle("BUTTON_CHANGE_GREETING"), 'change_greeting'),
-        callbackButton(ctx.getTitle("BUTTON_CHANGE_HELP"), 'change_help'),
-        callbackButton(ctx.getTitle("BUTTON_CHANGE_CARD"), 'change_card'),
-        callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), 'change_photo')
-    ], { columns: 1 })
-
-    return keyboard
-}
-
-
-exports.admins_list_keyboard = (ctx, admins) => {
-
-    const keyboard = inlineKeyboard(admins.map(({ userId }) => callbackButton(userId, "admin-"+userId)), { columns: 2 })
-
-    return keyboard
-}
-
-
-exports.add_delete_keyboard = (ctx ) => {
-
-    const keyboard = inlineKeyboard([
-        callbackButton("ADD", 'add'),
-        callbackButton("DELETE", 'delete')
-    ], { columns: 2 })
-
-    return keyboard
-}
-
-
-exports.clients_list_keyboard = (ctx, clients) => {
-
-    const keyboard = inlineKeyboard(clients.map(({ client_id, name }) => callbackButton(name, "client-"+client_id)), { columns: 2 })
-
-    keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('BUTTON_ADD_CLIENT'), 'addClient')]
-    )
-
-    return keyboard
-}
-
-
-exports.cities_list_admin_keyboard = (ctx, cities) => {
-
-    const keyboard = inlineKeyboard(cities.map(({ name, id }) => 
-     callbackButton(name, "city-"+id)), { columns: 2 })
-
-     keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('BUTTON_ADD_CITY'), 'addCity')],
-    )
-    return keyboard
-}
-
-exports.points_list_admin_keyboard = (ctx, cities) => {
-
-    const keyboard = inlineKeyboard(cities.map(({ name, id }) => 
-     callbackButton(name, "point-"+id)), { columns: 2 })
-
-     keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle('BUTTON_ADD_POINT'), 'add_point')],
-        [callbackButton(ctx.getTitle('BUTTON_BACK'), 'back')],
-    )
-    return keyboard
-}
-
-
-exports.custom_keyboard = (ctx, bNames, bLinks) => {
-
-    let k=inlineKeyboard([])
-
-    if (bNames.length!=bLinks.length) return k;
-
-    bNames.forEach((name,id)=>{
-        k.reply_markup.inline_keyboard.push([callbackButton(ctx.getTitle(name), bLinks[id])])
-    })
-
-    k.resize();
-
-    return k;
-}
-
-exports.custom_obj_keyboard = (ctx, bNamesObj) => {
-    let k=inlineKeyboard([])
-
-    Object.entries(bNamesObj)?.forEach(([name,link])=>{
-       // console.log(name, link)
-        k.reply_markup.inline_keyboard.push([callbackButton(ctx.getTitle(name), link)])
-    })
-
-    return k;
-}
-
-
-
-exports.ctype_keyboard = (ctx, cTypes) => {
-
-    return this.dictionary_keyboard(cTypes, 'ctype')
-}
-exports.comm_type_keyboard = (ctx, commTypes) => {
-
-    return this.dictionary_keyboard(commTypes, 'commtype')
-}
-exports.etype_keyboard = (ctx, eTypes) => {
-
-    return this.dictionary_keyboard(eTypes, 'etype')
-}
-exports.add_works_keyboard = (ctx, works) => {
-
-    let k = this.dictionary_keyboard(works, 'work')
-
-    if (ctx.scene.state.input?.works) 
-     k.reply_markup.inline_keyboard.push([callbackButton(ctx.getTitle("BUTTON_ENOUGH"), 'confirm')])
-
-    return k
-}
-exports.dictionary_keyboard = (dictionary, tag)=> {
-    let k=inlineKeyboard([], { columns: 2 })
-
-    dictionary.forEach((type_name,id)=>{
-        k.reply_markup.inline_keyboard.push([callbackButton(type_name, `${tag}-${id}`)])
-    })
-
-    return k;
-}
-
-
-exports.skip_keyboard = (ctx) => this.custom_keyboard(ctx,["SKIP"],["skip"])
-
-exports.t_opportunity_keyboard = (ctx) => this.custom_keyboard(ctx,["BUTTON_CITY", "BUTTON_REGION", "NO"],["city","region", "0"])
-
-
-exports.payment_type_keyboard= (ctx) => inlineKeyboard([
-    
-    callbackButton(ctx.getTitle('BUTTON_PAY_AGENT'), 'pay_agent'),
-    callbackButton(ctx.getTitle('BUTTON_PAY_ALPINIST'), 'pay_alpinist'),
-
-
-], { columns: 1 })
-
-exports.template_keyboard= (ctx) => inlineKeyboard([
-    
-    callbackButton(ctx.getTitle('START_NEW'), 'start_new'),
-    callbackButton(ctx.getTitle('CONTINUE'), 'continue'),
-
-
-], { columns: 1 })
-
-
-exports.choose_c_keyboard = (ctx) => inlineKeyboard([
-        
-        callbackButton(ctx.getTitle('BUTTON_CHANGE_REGION'), 'region'),
-        callbackButton(ctx.getTitle('BUTTON_CHANGE_CITY'), 'city'),
-        callbackButton(ctx.getTitle('BUTTON_CHANGE_DISTRICT'), 'district'),
-        callbackButton(ctx.getTitle('BUTTON_CHANGE_ADDRESS'), 'address'),
-        callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-
-    
-    ], { columns: 1 })
-
-exports.choose_city_keyboard = (ctx) => inlineKeyboard([
-    
-    callbackButton(ctx.getTitle('BUTTON_CHANGE_REGION'), 'region'),
-    callbackButton(ctx.getTitle('BUTTON_CHANGE_CITY'), 'city'),
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-
-
-], { columns: 1 })
-
-exports.rates_keyboard = (ctx) => this.custom_keyboard(ctx,
-    ["BUTTON_5S", "BUTTON_4S", "BUTTON_3S","BUTTON_2S","BUTTON_1S"],
-    ["rate-5","rate-4","rate-3","rate-2","rate-1"])
-
-
-exports.previous_step_keyboard = (ctx) => this.custom_keyboard(ctx,["BUTTON_PREVIOUS"],["previous_step"])
-
-exports.greetings_keyboard = (ctx) => this.custom_keyboard(ctx,["IUNDERSTOOD"],["confirm"])
-
-exports.greetings_fin_keyboard = (ctx) => this.custom_keyboard(ctx,["FIN"],["fin"])
-
-exports.skip_previous_keyboard = (ctx) => inlineKeyboard([
-        
-    callbackButton(ctx.getTitle('BUTTON_PREVIOUS'), 'previous_step'),
-    callbackButton(ctx.getTitle('BUTTON_SKIP'), 'skip'),
-
-
-], { columns: 2 })
-
-
-
-
- exports.client_settings_keyboard = (ctx) => this.custom_keyboard(ctx,["NAME", "CONTRACT_TYPE", "CONTACTS"],
- ["update_name","update_contract_type", "update_contacts"])
-
- exports.update_keyboard = (ctx) => this.custom_keyboard(ctx,["BUTTON_RELOAD"],
- ["reload"])
-
- 
-
-exports.confirm_cancel_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm'),
-    callbackButton(ctx.getTitle('BUTTON_CANCEL'), 'cancel')
-
-], { columns: 1 })
-
-
-
-exports.go_back_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_GO_BACK'), 'go_back')
-])
-
-
-
-exports.skip_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_SKIP'), 'skip')
-])
-
-exports.cancel_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CANCEL'), 'cancel')
-])
-
-exports.confirm_keyboard = (ctx) => inlineKeyboard([
-
-    callbackButton(ctx.getTitle('BUTTON_CONFIRM'), 'confirm')
-])
-
-
-
+const { Markup } = require("telegraf");
+
+const callbackButton = Markup.button.callback;
+const urlButton = Markup.button.url;
+const { inlineKeyboard } = Markup;
+
+exports.new_appointment_keyboard = (ctx, a_count, f_count) => {
+  const keyboard = inlineKeyboard(
+    [callbackButton(ctx.getTitle("BUTTON_NEW_APPOINTMENT"), "new_appointment")],
+    { columns: 1 }
+  );
+
+  if (a_count > 0)
+    keyboard.reply_markup.inline_keyboard.push([
+      callbackButton(ctx.getTitle("BUTTON_APPOINTMENTS"), "appointments"),
+    ]);
+
+  if (f_count > 0)
+    keyboard.reply_markup.inline_keyboard.push([
+      callbackButton(ctx.getTitle("BUTTON_FINISHED_A"), "finished"),
+    ]);
+
+  return keyboard;
+};
+
+exports.appointsments_keyboard = (ctx, app) => {
+  let k = inlineKeyboard([]);
+
+  app.forEach(({ id, description }) => {
+    k.reply_markup.inline_keyboard.push([
+      callbackButton(description, "appointsment_" + id),
+    ]);
+  });
+
+  return k;
+};
+
+exports.register_lawyer_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [callbackButton(ctx.getTitle("BUTTON_REGISTER_LAWYER"), "register")],
+    { columns: 1 }
+  );
+
+  return keyboard;
+};
+
+exports.check_enter_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("REENTER"), "re_enter"),
+      callbackButton(ctx.getTitle("NEXT"), "next"),
+    ],
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.i_paid_keyboard = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("I_PAID"), "i_paid_" + id),
+  ]);
+};
+
+exports.appointment_finish_kb = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("FINISH"), "finish_" + id),
+  ]);
+};
+
+exports.pay_link_kb = (ctx, link) => {
+  return inlineKeyboard([
+    [urlButton("Оплатить", link)],
+    [callbackButton(ctx.getTitle("I_PAID_A"), "i_paid_a")],
+  ]);
+};
+
+exports.appointment_cancel_kb = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("CANCEL"), "cancel_" + id),
+  ]);
+};
+
+exports.drop_get_ap_keyboard_main = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("DROP_APPOINTMENT"), "drop_appointment_main"),
+      callbackButton(ctx.getTitle("CHOOSE_WORKER"), "choose_worker_main"),
+    ],
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.drop_get_ap_keyboard = (ctx, id) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(
+        ctx.getTitle("DROP_APPOINTMENT"),
+        "drop_appointment_" + id
+      ),
+      callbackButton(ctx.getTitle("CHOOSE_WORKER"), "choose_worker_" + id),
+    ],
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
 
 exports.main_menu_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("CLIENT_SCENE"), "enter_client"),
+      callbackButton(ctx.getTitle("LAWYER_SCENE"), "enter_lawyer"),
+      callbackButton(ctx.getTitle("ADMIN_SCENE"), "enter_admin"),
+    ],
+    { columns: 3 }
+  );
 
+  return keyboard;
+};
 
-//urlButton(ctx.getTitle(`BUTTON_RANDOM`), link)
-    const keyboard = inlineKeyboard(
-       // link ?
-         [[callbackButton(ctx.getTitle('BUTTON_GET_RANDOM'), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`)]]
-        // [[callbackButton(ctx.getTitle(`BUTTON_CATEGORIES`), `categories`)]]
-        )
+exports.admin_main_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("APPOINTMENTS"), "appointments"),
+      callbackButton(ctx.getTitle("LAWYERS"), "lawyers"),
+      callbackButton(ctx.getTitle("PAYMENTS"), "payments"),
+    ],
+    { columns: 2 }
+  );
 
+  return keyboard;
+};
 
-    return keyboard
-}
+exports.admin_main_keyboard_owner = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("APPOINTMENTS"), "appointments"),
+      callbackButton(ctx.getTitle("LAWYERS"), "lawyers"),
+    ],
+    { columns: 2 }
+  );
 
-exports.categories_list_keyboard = (ctx, data, totalCount) => {
+  return keyboard;
+};
 
+exports.i_gets = (ctx, id) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(
+        ctx.getTitle("I_GET_APPOINTMENT"),
+        "get_appointment_" + id
+      ),
+    ],
+    { columns: 1 }
+  );
 
+  return keyboard;
+};
 
-    const categoryButtons = Object.entries(data)?.sort(SortArray)?.map(([name, {link, count} ]) => {
-       return callbackButton(`${name} ${count}`, `category-${name}`)
-   })
-    const keyboard = inlineKeyboard([callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`,[totalCount]), `back_random`),...categoryButtons], { columns: 1 })
+exports.choose_worker_keyboard = (ctx, workers) => {
+  let k = inlineKeyboard([]);
 
+  console.log(workers);
 
-     keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle(`BUTTON_ALL_CATEGORIES`,[totalCount]), `back_random`)],
-        //[callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)],
-        
-    )
+  workers.forEach(({ fio, id, rate, city }) => {
+    console.log(id, fio, rate);
+    k.reply_markup.inline_keyboard.push([
+      callbackButton(
+        `${fio ?? "Аноним"} ${rate ?? "без оцен."}`,
+        "worker_" + id
+      ),
+    ]);
+  });
 
-    return keyboard
-}
+  return k;
+};
 
+exports.drop_verify_keyboard = (ctx, id) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("DROP_LAWYER"), "skip_" + id),
+      callbackButton(ctx.getTitle("VERIFY_LAWYER"), "verify_" + id),
+    ],
+    { columns: 2 }
+  );
 
+  return keyboard;
+};
 
-exports.item_keyboard = (ctx, link, category_name) => {
+exports.orders_reviews_keyboard = (ctx, orders) => {
+  let k = inlineKeyboard([]);
 
-    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)]]);//,[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN_CATEGORY`,[`: ${category_name}`]), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`)]], { columns: 2 })
+  orders.forEach(({ description, id, worker_id }) => {
+    k.reply_markup.inline_keyboard.push([
+      callbackButton(
+        description ?? "  ",
+        worker_id ? "order_" + id : "appointment_" + id
+      ),
+    ]);
+  });
 
-    return keyboard
-}
-exports.item_keyboard_main = (ctx, link) => {
+  return k;
+};
 
-    const keyboard = inlineKeyboard([[urlButton(ctx.getTitle(`GO_TO_URL`), link)]]);//,[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN`), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`),/*callbackButton(ctx.getTitle(`BUTTON_HIDE_TOTAL`), `hide`)*/]], { columns: 2 })
+exports.rate_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton("1", "rate_1"),
+      callbackButton("2", "rate_2"),
+      callbackButton("3", "rate_3"),
+      callbackButton("4", "rate_4"),
+      callbackButton("5", "rate_5"),
+    ],
+    { columns: 1 }
+  );
 
-    return keyboard
-}
+  return keyboard;
+};
 
-function SortArray([name],[name2]){
-    if (name < name2) {return -1;}
-    if (name > name2) {return 1;}
-    return 0;
-}
+exports.admins_actions_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_ADD_ADMIN"), "addAdmin"),
+      callbackButton(ctx.getTitle("BUTTON_DELETE_ADMIN"), "deleteAdmin"),
+    ],
+    { columns: 2 }
+  );
 
+  return keyboard;
+};
 
-exports.categories_list_admin_keyboard = (ctx, data) => {
+exports.captcha_actions_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_SEND_CAPTCHA"), "send_captcha"),
+      callbackButton(ctx.getTitle("BUTTON_CANCEL_CAPTCHA"), "cancel_captcha"),
+    ],
+    { columns: 1 }
+  );
 
-    const keyboard = inlineKeyboard(data?.sort(SortArray)?.map((name) => 
-     callbackButton(name, `category-${name}`)), { columns: 2 })
+  return keyboard;
+};
 
-     keyboard.reply_markup.inline_keyboard.push(
-        [callbackButton(ctx.getTitle(`BUTTON_ADD_FILE`), `add-file`)],
-        [callbackButton(ctx.getTitle(`BUTTON_ADD_ZIP_FILE`), `add-zip-file`)],
-        [callbackButton(ctx.getTitle(`BUTTON_ADD_CATEGORY`), `add-category`)],
-    )
-    
-    return keyboard
-}
+exports.change_text_actions_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_CHANGE_GREETING"), "change_greeting"),
+      callbackButton(ctx.getTitle("BUTTON_CHANGE_HELP"), "change_help"),
+      callbackButton(ctx.getTitle("BUTTON_CHANGE_CARD"), "change_card"),
+      callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), "change_photo"),
+    ],
+    { columns: 1 }
+  );
 
+  return keyboard;
+};
 
-exports.category_admin_keyboard = (ctx, name) => {
+exports.admins_list_keyboard = (ctx, admins) => {
+  const keyboard = inlineKeyboard(
+    admins.map(({ userId }) => callbackButton(userId, "admin-" + userId)),
+    { columns: 2 }
+  );
 
-    const keyboard = inlineKeyboard([[callbackButton(ctx.getTitle(`BUTTON_ADD_FILE`), `add-file-${name}`)],[callbackButton(ctx.getTitle(`BUTTON_DELETE`), `delete-category-${name}`)],[callbackButton(ctx.getTitle(`BUTTON_BACK`), `back`)]])
+  return keyboard;
+};
 
-    return keyboard
-}
+exports.add_delete_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [callbackButton("ADD", "add"), callbackButton("DELETE", "delete")],
+    { columns: 2 }
+  );
 
+  return keyboard;
+};
 
-exports.url_keyboard = (ctx, data) => {
+exports.custom_keyboard = (ctx, bNames, bLinks) => {
+  let k = inlineKeyboard([]);
 
-    const keyboard = inlineKeyboard(Object.entries(data).map(([name, link])=>[urlButton(ctx.getTitle(name), link)]));//,[callbackButton(ctx.getTitle(`BUTTON_GET_RANDOM_AGAIN_CATEGORY`,[`: ${category_name}`]), `random_link`)],[callbackButton(ctx.getTitle(`BUTTON_HIDE`), `hide`)]], { columns: 2 })
+  if (bNames.length != bLinks.length) return k;
 
-    return keyboard
-}
+  bNames.forEach((name, id) => {
+    k.reply_markup.inline_keyboard.push([
+      callbackButton(ctx.getTitle(name), bLinks[id]),
+    ]);
+  });
+
+  return k;
+};
+
+exports.custom_obj_keyboard = (ctx, bNamesObj) => {
+  let k = inlineKeyboard([], { columns: 3 }).resize();
+
+  Object.entries(bNamesObj)?.forEach(([name, link], i) => {
+    // console.log(name, link)
+    if (i % 3 === 0)
+      k.reply_markup.inline_keyboard.push([
+        callbackButton(ctx.getTitle(name), link),
+      ]);
+    else
+      k.reply_markup.inline_keyboard[
+        k.reply_markup.inline_keyboard.length - 1
+      ].push(callbackButton(ctx.getTitle(name), link));
+  });
+
+  return k.resize();
+};
+
+exports.dictionary_keyboard = (dictionary, tag) => {
+  let k = inlineKeyboard([], { columns: 2 });
+
+  dictionary.forEach((type_name, id) => {
+    k.reply_markup.inline_keyboard.push([
+      callbackButton(type_name, `${tag}-${id}`),
+    ]);
+  });
+
+  return k;
+};
+
+exports.skip_keyboard = (ctx) => this.custom_keyboard(ctx, ["SKIP"], ["skip"]);
+
+exports.greetings_keyboard = (ctx) =>
+  this.custom_keyboard(ctx, ["IUNDERSTOOD"], ["confirm"]);
+
+exports.greetings_fin_keyboard = (ctx) =>
+  this.custom_keyboard(ctx, ["FIN"], ["fin"]);
+
+exports.skip_previous_keyboard = (ctx) =>
+  inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_PREVIOUS"), "previous_step"),
+      callbackButton(ctx.getTitle("BUTTON_SKIP"), "skip"),
+    ],
+    { columns: 2 }
+  );
+
+exports.confirm_cancel_keyboard = (ctx) =>
+  inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_CONFIRM"), "confirm"),
+      callbackButton(ctx.getTitle("BUTTON_CANCEL"), "cancel"),
+    ],
+    { columns: 1 }
+  );
+
+exports.go_back_keyboard = (ctx) =>
+  inlineKeyboard([callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back")]);
+
+exports.skip_keyboard = (ctx) =>
+  inlineKeyboard([callbackButton(ctx.getTitle("BUTTON_SKIP"), "skip")]);
+
+exports.cancel_keyboard = (ctx) =>
+  inlineKeyboard([callbackButton(ctx.getTitle("BUTTON_CANCEL"), "cancel")]);
+
+exports.confirm_keyboard = (ctx) =>
+  inlineKeyboard([callbackButton(ctx.getTitle("BUTTON_CONFIRM"), "confirm")]);

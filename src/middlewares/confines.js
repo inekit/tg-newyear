@@ -41,10 +41,6 @@ class ConfineChecker {
     
         //dtime_start(text) {return this.date(text)},
     
-        phone(text){
-            console.log(text)
-            return parseInt(text) == text
-        },
         time(text){
     
             if (!text) return

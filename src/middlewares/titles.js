@@ -22,7 +22,7 @@ class Titles {
 
 	}
 
-	insert(string, language, replacers) {
+	insert(string, language, replacers, markup) {
 
 		const generator = (function* (replacers) {
 			
@@ -33,10 +33,13 @@ class Titles {
 
 		}).bind(this)(replacers)
 
-		return string.replaceAll(/\*/g, () => generator.next().value)
+		return markup === 'md2' ? 
+		 string.replaceAll(/\$/g, () => generator.next().value) :
+		 string.replaceAll(/\*/g, () => generator.next().value);
+
 	}
 
-	getTitle(title, language, replacers) {
+	getTitle(title, language, replacers, markup) {
 
 		if(!this.dictionary[title]) {
 
@@ -54,9 +57,7 @@ class Titles {
 
 		const string = this.dictionary[title][language] || this.dictionary[title]
 
-
-
-		let res = replacers ? this.insert(string, language, replacers) : string
+		let res = replacers ? this.insert(string, language, replacers, markup) : string
 
 		return res;
 	}

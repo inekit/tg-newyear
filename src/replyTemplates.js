@@ -12,8 +12,9 @@ module.exports= {
 
         if (!ctx.scene.state.input) ctx.scene.state.input = {}
 
+        //console.log(ctx.scene.state.input)
+
         //console.log(stepName, header, confineNames, kbName, isLast, sceneName)
-        console.log(1, confineNames)
 
         if (!ConfineChecker.passedConfines(ctx?.message?.text,confineNames, stepName)) return ctx.replyWithTitle("TRY_AGAIN")
         
