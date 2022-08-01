@@ -309,9 +309,9 @@ function sendSum(ctx) {
   ).toFixed(0);
 
   ctx.replyWithTitle("SUM_MESSAGE", [
-    KRW,
-    USD,
-    EUR,
+    KRW.tyString().replace(".", ","),
+    USD.tyString().replace(".", ","),
+    EUR.tyString().replace(".", ","),
     numberWithSpaces(rubPrice),
     numberWithSpaces(usdPrice),
     numberWithSpaces(invoiceSum),
