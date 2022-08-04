@@ -34,8 +34,11 @@ clientScene.command("volume", (ctx) => {
 clientScene.command("age", (ctx) => {
   if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
 
-  if (ctx.wizard.cursor === 2) ctx.replyStep(2);
-  else ctx.replyStep(ctx.wizard.cursor);
+  if (!ctx.wizard.state.input?.price) return ctx.replyStep(0);
+
+  if (!ctx.wizard.state.input?.volume) return ctx.replyStep(1);
+
+  ctx.replyStep(2);
 });
 
 clientScene.command("krw", async (ctx) => {
@@ -96,7 +99,19 @@ clientScene
       "3300 см3": "3300",
       "3500 см3": "3500",
       "3800 см3": "3800",
+      "4000 см3": "4000",
+      "4400 см3": "4400",
       Электромобиль: "0",
+    },
+    onInput: (ctx) => {
+      if (parseInt(ctx.message.text) != ctx.message.text)
+        return ctx.replyWithTitle("ENTER_TEXT_VOLUME");
+
+      ctx.wizard.state.input.volume = ctx.message?.text;
+
+      if (ctx.wizard.state.input.age) return sendSum(ctx);
+
+      ctx.replyNextStep();
     },
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
