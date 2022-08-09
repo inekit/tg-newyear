@@ -320,7 +320,7 @@ function sendSum(ctx) {
     3000 +
     20000 +
     1270 * parseFloat(USD) +
-    150000
+    100000
   ).toFixed(0);
 
   ctx.replyWithTitle("SUM_MESSAGE", [
