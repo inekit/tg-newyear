@@ -302,7 +302,7 @@ function sendSum(ctx) {
       if (parseInt(rubPrice) <= maxPrice) sbor = price;
     });
 
-  const invoiceSum = (parseInt(usdPrice) + 300 + 250 + 1270).toFixed(0);
+  const invoiceSum = (parseInt(usdPrice) + 350 + 250 + 1300).toFixed(0);
 
   console.log(parseInt(parseInt(usdPrice).toFixed(0)));
 
@@ -314,13 +314,13 @@ function sendSum(ctx) {
     parseInt(taxRub) +
     parseInt(sbor) +
     utilSbor +
-    300 * parseFloat(USD) +
+    350 * parseFloat(USD) +
     250 * parseFloat(USD) +
     4000 +
     3000 +
     20000 +
-    1270 * parseFloat(USD) +
-    100000
+    1300 * parseFloat(USD) +
+    144000
   ).toFixed(0);
 
   ctx.replyWithTitle("SUM_MESSAGE", [
