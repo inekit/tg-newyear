@@ -1,340 +1,177 @@
-const { CustomWizardScene, titles } = require("telegraf-steps-engine");
-const CustomContextWizard = require("telegraf-steps-engine/context");
-const dateFormats = ["D.MMMM.YYYY", "DD.MM.YY", "DD.MM.YYYY", "DD.MM.YYYY"];
-const getCurrencies = require("../Utils/getCources");
-const moment = require("moment");
-function numberWithSpaces(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-}
+const {
+  CustomWizardScene,
+  titles,
+  handlers: { FilesHandler },
+} = require("telegraf-steps-engine");
 
 const clientScene = new CustomWizardScene("clientScene").enter(async (ctx) => {
-  const { USD, EUR, KRW } = (ctx.scene.state.currencies =
-    await getCurrencies());
-
   delete ctx.wizard.state.input;
 
-  ctx.replyWithTitle("START_TITLE", [KRW, USD, EUR]);
+  ctx.replyWithKeyboard("START_TITLE", "new_appointment_keyboard");
 });
 
-clientScene.command("price", async (ctx) => {
-  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
-
-  await ctx.replyWithTitle("ENTER_PRICE");
-
-  ctx.wizard.selectStep(0);
-});
-
-clientScene.command("volume", (ctx) => {
-  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
-
-  if (ctx.wizard.cursor === 2) ctx.replyStep(1);
-  else ctx.replyStep(ctx.wizard.cursor);
-});
-
-clientScene.command("age", (ctx) => {
-  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
-
-  if (!ctx.wizard.state.input?.price) return ctx.replyStep(0);
-
-  if (!ctx.wizard.state.input?.volume) return ctx.replyStep(1);
-
-  ctx.replyStep(2);
-});
-
-clientScene.command("krw", async (ctx) => {
-  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
-
-  ctx.replyStep(5);
-});
-
-clientScene.command("eur", (ctx) => {
-  if (!ctx.scene.state.currencies) return; // ctx.scene.enter("clientScene");
-
-  ctx.replyStep(4);
-});
-
-clientScene.command("usd", (ctx) => {
-  if (!ctx.scene.state.currencies) return; //ctx.scene.reenter();
-
-  ctx.replyStep(3);
+clientScene.action("new_appointment", (ctx) => {
+  ctx.answerCbQuery().catch((e) => {});
+  ctx.replyStep(0);
 });
 
 clientScene
-  .addStep({
-    variable: "price",
-    cb: async (ctx) => {
-      if (parseInt(ctx.message.text) != ctx.message.text)
-        return ctx.replyWithTitle("ENTER_TEXT_PRICE");
-      if (parseInt(ctx.message.text) < 5000000)
-        await ctx.replyWithTitle("TOO_LOW_PRICE", [
-          numberWithSpaces(
-            (
-              parseInt(ctx.message.text) /
-              parseFloat(ctx.scene.state.currencies.KRW)
-            ).toFixed(0)
-          ),
-        ]);
-
-      !ctx.wizard.state.input
-        ? (ctx.wizard.state.input = { price: ctx.message.text })
-        : (ctx.wizard.state.input.price = ctx.message.text);
-
-      if (ctx.wizard.state.input.volume && ctx.wizard.state.input.age)
-        return sendSum(ctx);
-      if (ctx.wizard.state.input.volume) return ctx.replyStep(2);
-      ctx.replyNextStep();
+  .addSelect({
+    variable: "work_type",
+    options: {
+      Расчетка: "Расчетка",
+      "Курсовая работа": "Курсовая работа",
+      "Лабораторная работа": "Лабораторная работа",
+      "Проектная работа": "Проектная работа",
+      "Дипломная работа": "Дипломная работа",
+      "Помощь на экзамене": "Помощь на экзамене",
+      Шпаргалка: "Шпаргалка",
     },
   })
+  .addStep({
+    variable: "subject",
+  })
   .addSelect({
-    variable: "volume",
+    variable: "course",
     options: {
-      "1000 см3": "1000",
-      "1200 см3": "1200",
-      "1500 см3": "1500",
-      "1600 см3": "1600",
-      "2000 см3": "2000",
-      "2200 см3": "2200",
-      "2500 см3": "2500",
-      "3000 см3": "3000",
-      "3300 см3": "3300",
-      "3500 см3": "3500",
-      "3800 см3": "3800",
-      "4000 см3": "4000",
-      "4400 см3": "4400",
-      Электромобиль: "0",
+      "1 курс": "1",
+      "2 курс": "2",
+      "3 курс": "3",
+      "4 курс": "4",
+    },
+  })
+  .addStep({
+    variable: "description",
+  })
+  .addSelect({
+    variable: "deadline",
+    options: {
+      "1-2 дня": "1-2",
+      "1 неделя": "7",
     },
     onInput: (ctx) => {
-      if (parseInt(ctx.message.text) != ctx.message.text)
-        return ctx.replyWithTitle("ENTER_TEXT_VOLUME");
+      if (
+        parseInt(ctx.message.text) != ctx.message.text ||
+        parseInt(ctx.message.text) > 365
+      )
+        return ctx.replyWithTitle("ENTER_NUMBER_DEADLINE");
 
-      ctx.wizard.state.input.volume = ctx.message?.text;
-
-      if (ctx.wizard.state.input.age) return sendSum(ctx);
+      ctx.wizard.state.input.deadline = ctx.message?.text;
 
       ctx.replyNextStep();
     },
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      ctx.wizard.state.input.volume = ctx.match[0];
+      ctx.wizard.state.input.deadline = ctx.match[0];
 
-      if (ctx.wizard.state.input.age) return sendSum(ctx);
+      ctx.replyNextStep();
+    },
+  })
+  .addStep({
+    variable: "files",
+    type: "action",
+    skipTo: "promo",
+    handler: new FilesHandler(async (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
+      ctx.wizard.state.enoughMessageSent = false;
+
+      ctx.replyNextStep();
+    }),
+  })
+  .addSelect({
+    variable: "promo",
+    options: {
+      "У меня нет промокода": "no",
+    },
+    onInput: async (ctx) => {
+      ctx.wizard.state.input.promo = ctx.message.text;
+
+      await sendToAdmin(ctx);
+
+      ctx.replyNextStep();
+    },
+    cb: async (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
+      await sendToAdmin(ctx);
 
       ctx.replyNextStep();
     },
   })
   .addSelect({
-    variable: "age",
+    variable: "ending",
     options: {
-      "Младше 3 лет": "0",
-      "От 3 до 5 лет": "3",
-      "Старше 5 лет": "6",
-    },
-    onInput: (ctx) => {
-      const now = moment();
-      const date = moment(ctx.message.text, dateFormats, true);
-
-      if (date >= now || !date.isValid())
-        return ctx.replyWithTitle("ENTER_VALID_DATE");
-
-      ctx.wizard.state.input.date_register = date.toString();
-
-      sendSum(ctx);
+      "Сделать новый заказ": "new",
     },
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      ctx.wizard.state.input.age = ctx.match[0];
-      sendSum(ctx);
-    },
-  })
-  .addStep({
-    variable: "usd",
-    cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text)
-        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
-
-      ctx.scene.state.currencies.USD = ctx.message.text;
-      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
-        return sendSum(ctx);
-      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
-      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
-      ctx.replyWithTitle("ENTER_PRICE");
-      ctx.wizard.selectStep(0);
-    },
-  })
-  .addStep({
-    variable: "eur",
-    cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text)
-        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
-
-      ctx.scene.state.currencies.EUR = ctx.message.text;
-      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
-        return sendSum(ctx);
-      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
-      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
-      ctx.replyWithTitle("ENTER_PRICE");
-      ctx.wizard.selectStep(0);
-    },
-  })
-  .addStep({
-    variable: "krw",
-    cb: (ctx) => {
-      if (parseFloat(ctx.message.text) != ctx.message.text)
-        return ctx.replyWithTitle("ENTER_CORRECT_FLOAT");
-
-      ctx.scene.state.currencies.KRW = ctx.message.text;
-      if (ctx.wizard.state.input?.volume && ctx.wizard.state.input?.age)
-        return sendSum(ctx);
-      if (ctx.wizard.state.input?.volume) return ctx.replyStep(2);
-      if (ctx.wizard.state.input?.price) return ctx.replyStep(1);
-      ctx.replyWithTitle("ENTER_PRICE");
-      ctx.wizard.selectStep(0);
+      if (ctx.match[0] === "new") {
+        delete ctx.wizard.state.input;
+        ctx.replyStep(0);
+      }
     },
   });
 
-function sendSum(ctx) {
-  let { USD, EUR, KRW } = ctx.scene.state.currencies;
+async function sendToAdmin(ctx) {
+  console.log(ctx.wizard.state);
 
-  USD = USD.replace(",", ".");
-  EUR = EUR.replace(",", ".");
-  KRW = KRW.replace(",", ".");
+  const admin_id = ctx.getTitle("ADMIN_ID");
 
-  let { price, volume, age, date_register } = ctx.wizard.state.input;
+  const username = ctx.from.username ? "@" + ctx.from.username : null;
 
-  price = parseInt(price);
+  let main_message;
 
-  volume = parseInt(volume);
+  const { work_type, subject, course, description, deadline, promo } =
+    ctx.wizard.state.input;
 
-  console.log(ctx.wizard.state.input, price, parseFloat(KRW));
+  if (!username) {
+    const user_message = await ctx.telegram.forwardMessage(
+      admin_id,
+      ctx.from.id,
+      ctx.wizard.state.message_id
+    );
 
-  const rubPrice = (parseInt(price) / parseFloat(KRW)).toFixed(0);
-
-  const usdPrice = (parseFloat(rubPrice) / parseFloat(USD)).toFixed(0);
-
-  const eurPrice = (parseFloat(rubPrice) / parseFloat(EUR)).toFixed(0);
-
-  if (date_register) {
-    const date = moment(ctx.message?.text, dateFormats, true);
-    const now = moment();
-    age = now.diff(date, "year");
-    console.log(age);
-    age = age < 3 ? "0" : age.toString();
+    main_message = await ctx.telegram.sendMessage(
+      admin_id,
+      ctx.getTitle("NEW_APPOINTMENT", [
+        username,
+        work_type,
+        subject,
+        course + " курс",
+        description,
+        deadline.toString() + " дн.",
+        promo ?? "Нет",
+      ]),
+      {
+        reply_to_message_id: user_message?.message_id,
+        parse_mode: "HTML",
+      }
+    );
   }
 
-  const utilSbor = age !== "0" ? 5300 : 3400;
+  main_message = await ctx.telegram.sendMessage(
+    admin_id,
+    ctx.getTitle("NEW_APPOINTMENT", [
+      username,
+      work_type,
+      subject,
+      course + " курс",
+      description,
+      deadline.toString() + " дн.",
+      promo ?? "Нет",
+    ]),
+    { parse_mode: "HTML" }
+  );
 
-  if (age === "0") {
-    console.log(eurPrice);
-    const perc = eurPrice > 8499 ? 0.48 : 0.54;
-    const prices = {
-      8500: 2.5,
-      16700: 3.5,
-      42300: 5.5,
-      84500: 7.5,
-      169000: 15,
-      500000000: 20,
-    };
-
-    let volPrice;
-    Object.entries(prices)
-      .reverse()
-      .forEach(([maxSum, price]) => {
-        if (eurPrice <= maxSum) volPrice = price * parseInt(volume);
+  if (ctx.wizard.state.input?.documents)
+    for (fileId of ctx.wizard.state.input.documents)
+      ctx.telegram.sendDocument(admin_id, fileId, {
+        reply_to_message_id: main_message?.message_id,
+        disable_notification: true,
       });
-
-    console.log(perc * eurPrice, volPrice);
-
-    tax = Math.max(perc * eurPrice, volPrice);
-  } else if (parseInt(age) <= 5) {
-    const prices = {
-      1000: 1.5,
-      1500: 1.7,
-      1800: 2.5,
-      2300: 2.7,
-      3000: 3,
-      300000: 3.6,
-    };
-
-    Object.entries(prices)
-      .reverse()
-      .forEach(([maxVolume, price]) => {
-        if (parseInt(volume) <= maxVolume) tax = price * parseInt(volume);
-        console.log(tax, parseInt(volume) <= maxVolume);
-      });
-  } else {
-    const prices = {
-      1000: 3,
-      1500: 3.2,
-      1800: 3.5,
-      2300: 4.8,
-      3000: 5,
-      300000: 5.7,
-    };
-
-    Object.entries(prices)
-      .reverse()
-      .forEach(([maxVolume, price]) => {
-        if (parseInt(volume) <= maxVolume) tax = price * parseInt(volume);
-      });
-  }
-
-  let sbor;
-
-  const prices = {
-    200000: 775,
-    450000: 1550,
-    1200000: 3100,
-    2700000: 8530,
-    4200000: 12000,
-    5500000: 15500,
-    7000000: 20000,
-    8000000: 23000,
-    9000000: 25000,
-    10000000: 27000,
-    10000000000: 30000,
-  };
-
-  Object.entries(prices)
-    .reverse()
-    .forEach(([maxPrice, price]) => {
-      if (parseInt(rubPrice) <= maxPrice) sbor = price;
-    });
-
-  const invoiceSum = (parseInt(usdPrice) + 350 + 250 + 1300).toFixed(0);
-
-  console.log(parseInt(parseInt(usdPrice).toFixed(0)));
-
-  const taxRub = (tax * parseFloat(EUR)).toFixed(0);
-
-  console.log(taxRub);
-  const sum = (
-    parseInt(rubPrice) +
-    parseInt(taxRub) +
-    parseInt(sbor) +
-    utilSbor +
-    350 * parseFloat(USD) +
-    250 * parseFloat(USD) +
-    4000 +
-    3000 +
-    20000 +
-    1300 * parseFloat(USD) +
-    144000
-  ).toFixed(0);
-
-  ctx.replyWithTitle("SUM_MESSAGE", [
-    KRW.replace(".", ","),
-    USD.replace(".", ","),
-    EUR.replace(".", ","),
-    numberWithSpaces(rubPrice),
-    numberWithSpaces(usdPrice),
-    numberWithSpaces(invoiceSum),
-    numberWithSpaces(taxRub),
-    numberWithSpaces(sbor),
-    numberWithSpaces(utilSbor),
-    numberWithSpaces(sum),
-  ]);
 }
 
 module.exports = [clientScene];

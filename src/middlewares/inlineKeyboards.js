@@ -4,22 +4,11 @@ const callbackButton = Markup.button.callback;
 const urlButton = Markup.button.url;
 const { inlineKeyboard } = Markup;
 
-exports.new_appointment_keyboard = (ctx, a_count, f_count) => {
+exports.new_appointment_keyboard = (ctx) => {
   const keyboard = inlineKeyboard(
-    [callbackButton(ctx.getTitle("BUTTON_NEW_APPOINTMENT"), "new_appointment")],
+    [callbackButton(ctx.getTitle("MAKE_ORDER_BUTTON"), "new_appointment")],
     { columns: 1 }
   );
-
-  if (a_count > 0)
-    keyboard.reply_markup.inline_keyboard.push([
-      callbackButton(ctx.getTitle("BUTTON_APPOINTMENTS"), "appointments"),
-    ]);
-
-  if (f_count > 0)
-    keyboard.reply_markup.inline_keyboard.push([
-      callbackButton(ctx.getTitle("BUTTON_FINISHED_A"), "finished"),
-    ]);
-
   return keyboard;
 };
 
@@ -295,7 +284,7 @@ exports.custom_obj_keyboard = (ctx, bNamesObj) => {
 
   Object.entries(bNamesObj)?.forEach(([name, link], i) => {
     // console.log(name, link)
-    if (i % 3 === 0)
+    if (i % 2 === 0)
       k.reply_markup.inline_keyboard.push([
         callbackButton(ctx.getTitle(name), link),
       ]);

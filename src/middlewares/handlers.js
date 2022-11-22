@@ -12,7 +12,7 @@ const {
 //const dialogs = require('./dialogs')
 //const updates = require('../Modules/updates')
 const middlewares = require("./middlewares");
-const query = require("../DB/performQuery");
+const query = "";
 const actions = require("./actions");
 
 const coordinatesHandler = new Composer(),
@@ -24,11 +24,11 @@ class FilesHandler extends Composer {
   constructor(confirmCb) {
     super();
 
-    this.on("photo", (ctx) => inputFile(ctx, "photo"));
+    //this.on("photo", (ctx) => inputFile(ctx, "photo"));
 
     //this.on('audio', ctx=>inputFile(ctx, "audio"))
 
-    //this.on('document', ctx=>inputFile(ctx, "document"))
+    this.on("document", (ctx) => inputFile(ctx, "document"));
 
     this.action("confirm", async (ctx) => confirmCb(ctx));
   }
@@ -129,11 +129,12 @@ function inputFile(ctx, type) {
 
   ctx.wizard.state.input?.[type + "s"].push(file_id);
 
-  //if (ctx.scene.state.sceneName === "ordersScene") store.setOrderDraft(ctx.wizard.cursor, type+"s", ctx.wizard.state.input?.[type+"s"], ctx.from.id)
+  !ctx.wizard.state.enoughMessageSent &&
+    ctx.replyWithKeyboard("ENTER_MORE", "confirm_keyboard");
 
-  const { kbTop, kbBottom } = middlewares.initKeyboards("enough_keyboard");
+  ctx.wizard.state.message_id = ctx.message.message_id;
 
-  middlewares.sendInputReply(ctx, null, kbTop, kbBottom);
+  ctx.wizard.state.enoughMessageSent = true;
 }
 
 coordinatesHandler.on("location", async (ctx) => await handleLocation(ctx));
@@ -364,12 +365,12 @@ async function addOrder(ctx) {
 }
 
 module.exports = {
-  coordinatesHandler,
-  audiosHandler,
-  photosHandler,
+  //coordinatesHandler,
+  //audiosHandler,
+  //photosHandler,
   FilesHandler,
-  createH,
-  pTypeHandler,
-  worksHandler,
+  //createH,
+  //pTypeHandler,
+  //worksHandler,
   CoordinatesHandler,
 };
