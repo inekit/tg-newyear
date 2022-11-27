@@ -9,6 +9,7 @@ const scene = new CustomWizardScene("getMoneyScene").enter((ctx) => {
   ctx.replyWithKeyboard("ENTER_MONEY_SUM", "main_menu_back_keyboard");
   ctx.wizard.selectStep(0);
 });
+const payments = require("../../payments/payments");
 
 scene
   .addStep({
@@ -61,20 +62,41 @@ scene
         ]);
 
         ctx.wizard.selectStep(2);
-      } else
-        ctx.replyWithKeyboard(
-          "REQUISITES_QIWI",
-          {
-            name: "pay_qiwi_keyboard",
-            args: [
-              "https://oplata.qiwi.com/form/?invoice_uid=7f71caa0-f7eb-41b0-93f6-4f08152453de",
-            ],
-          },
-          [
-            "https://oplata.qiwi.com/form/?invoice_uid=7f71caa0-f7eb-41b0-93f6-4f08152453de",
-            money_sum,
-          ]
-        );
+      } else {
+        const connection = await tOrmCon;
+        connection
+          .getRepository("GetMoneyAppointment")
+          .save({
+            customer_id: ctx.from.id,
+            sum: money_sum,
+            bank: "qiwi",
+            status: "notpayed",
+          })
+          .then(async (res) => {
+            if (!res?.id) return;
+
+            const link = payments.createBill(
+              "qiwi",
+              money_sum,
+              "RUB",
+              res.id,
+              `https://t.me/${ctx.botInfo.username}`
+            );
+
+            ctx.replyWithKeyboard(
+              "REQUISITES_QIWI",
+              {
+                name: "pay_qiwi_keyboard",
+                args: [link],
+              },
+              [link, money_sum]
+            );
+          })
+          .catch(async (e) => {
+            console.log(e);
+            ctx.replyWithTitle("DB_ERROR");
+          });
+      }
     },
   })
   .addStep({

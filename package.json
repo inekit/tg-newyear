@@ -1,10 +1,12 @@
 {
   "dependencies": {
+    "@qiwi/bill-payments-node-js-sdk": "^3.2.1",
     "adm-zip": "^0.5.9",
     "axios": "^0.27.2",
     "dotenv": "^16.0.3",
     "edit-json-file": "^1.7.0",
     "elasticsearch": "^16.7.3",
+    "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "moment": "^2.29.3",
     "mysql": "^2.18.1",

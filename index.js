@@ -64,6 +64,8 @@ console.log("started");
       dropPendingUpdates: true,
     });
   }
+
+  require("./server")(ctx);
 })();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));

@@ -11,7 +11,7 @@ module.exports = new EntitySchema({
     },
     bank: {
       type: "enum",
-      enum: ["sber", "tinkoff"],
+      enum: ["sber", "tinkoff", "qiwi"],
       nullable: false,
     },
     sum: {
@@ -21,10 +21,11 @@ module.exports = new EntitySchema({
     reciept_photo_id: {
       type: "varchar",
       length: 255,
+      nullable: true,
     },
     status: {
       type: "enum",
-      enum: ["issued", "aprooved", "rejected"],
+      enum: ["issued", "aprooved", "notpayed", "rejected"],
       nullable: false,
       default: "issued",
     },

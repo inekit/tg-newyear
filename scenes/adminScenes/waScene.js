@@ -32,9 +32,12 @@ scene.enter(async (ctx) => {
   }
 
   const keyboard = { name: "wa_keyboard", args: [lastWa.id] };
+
+  const sumToPay = (lastWa.sum * 1.2).toFixed(0);
+
   const title = ctx.getTitle("WA_INFO", [
     lastWa.id,
-    lastWa.sum,
+    sumToPay,
     lastWa.withdrawal_address,
   ]);
 
@@ -70,13 +73,6 @@ scene.action(/^aproove\-([0-9]+)$/g, async (ctx) => {
     .then((res) => {
       const customer_id = res[0]?.[0]?.customer_id;
       const sum = res[0]?.[0]?.sum;
-
-      connection
-        .query(
-          "update users set balance_gold = balance_gold - $1 where id = $2",
-          [sum, customer_id]
-        )
-        .catch(console.log);
 
       ctx.telegram
         .sendMessage(
