@@ -2,6 +2,7 @@
   "dependencies": {
     "adm-zip": "^0.5.9",
     "axios": "^0.27.2",
+    "dotenv": "^16.0.3",
     "edit-json-file": "^1.7.0",
     "elasticsearch": "^16.7.3",
     "fs": "^0.0.1-security",
@@ -10,9 +11,11 @@
     "mysql2": "^2.3.3",
     "node-fetch": "^2.6.7",
     "nominatim-geocoder": "^0.1.4",
+    "pg": "^8.8.0",
     "telegraf": "^4.7.0",
     "telegraf-steps-engine": "file:src",
-    "typeorm": "^0.3.6"
+    "typeorm": "^0.3.6",
+    "typeorm-naming-strategies": "^4.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",

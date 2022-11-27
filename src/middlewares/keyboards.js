@@ -39,19 +39,28 @@ exports.main_menu_admin_keyboard = (ctx) => {
 
 exports.main_keyboard = (ctx, isAdmin) => {
   const buttons = [
-    [ctx.getTitle("BUTTON_BACK_USER")],
-    [ctx.getTitle("BUTTON_FAQ")],
-    [ctx.getTitle("BUTTON_BUY_NFT")],
-    [ctx.getTitle("BUTTON_ENTER_GROUP")],
-    [ctx.getTitle("BUTTON_CHANGE_ADDRESS")],
-    [ctx.getTitle("HELP_MODE")],
-    [ctx.getTitle("BUTTON_ABOUT")],
+    ctx.getTitle("GET_MONEY_BUTTON"),
+    ctx.getTitle("BUY_GOLD_BUTTON"),
+    ctx.getTitle("WITHDRAWAL_BUTTON"),
+    ctx.getTitle("SUPPORT_BUTTON"),
+    ctx.getTitle("PROFILE_BUTTON"),
+    ctx.getTitle("COURSE_BUTTON"),
+    ctx.getTitle("REVIEWS_BUTTON"),
   ];
 
-  if (isAdmin) buttons.push([ctx.getTitle("ADMIN_SCENE_BUTTON")]);
+  if (isAdmin) buttons.push(ctx.getTitle("BUTTON_BACK_ADMIN"));
 
-  return Markup.keyboard(buttons).resize();
+  return Markup.keyboard(buttons, { columns: 3 }).resize();
 };
+
+exports.admin_keyboard = (ctx) =>
+  Markup.keyboard([
+    [ctx.getTitle("BUTTON_ADD")],
+    [ctx.getTitle("BUTTON_WA"), ctx.getTitle("BUTTON_GA")],
+    [ctx.getTitle("BUTTON_COURSE")],
+    [ctx.getTitle("BUTTON_ADMINS")],
+    [ctx.getTitle("BUTTON_CLIENT_MENU")],
+  ]).resize();
 
 exports.categories_list_keyboard_bottom = (ctx, data, totalStr) => {
   const categoryButtons = data?.map((name) => {

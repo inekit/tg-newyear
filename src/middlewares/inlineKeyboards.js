@@ -4,6 +4,115 @@ const callbackButton = Markup.button.callback;
 const urlButton = Markup.button.url;
 const { inlineKeyboard } = Markup;
 
+exports.profile_keyboard = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("REFERAL_BUTTON"), "referal_menu"),
+  ]);
+};
+
+exports.referal_keyboard = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("MY_REFERALS_BUTTON"), "my_referals_menu"),
+    callbackButton(ctx.getTitle("BACK_BUTTON"), "back_to_profile"),
+  ]);
+};
+
+exports.my_referals_keyboard = (ctx, id) => {
+  return inlineKeyboard([
+    callbackButton(ctx.getTitle("BACK_BUTTON"), "back_to_referal"),
+  ]);
+};
+
+exports.support_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [
+      callbackButton("1", "support_1"),
+      callbackButton("2", "support_2"),
+      callbackButton("3", "support_3"),
+    ],
+    [
+      callbackButton("4", "support_4"),
+      callbackButton("5", "support_5"),
+      callbackButton("6", "support_6"),
+    ],
+    [
+      callbackButton("7", "support_7"),
+      //callbackButton(ctx.getTitle("CONNECT_BUTTON"), "connect_support"),
+      urlButton(ctx.getTitle("CONNECT_BUTTON"), "t.me/mafioznuk_0_0"),
+    ],
+  ]);
+};
+
+exports.current_support_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [
+      urlButton(ctx.getTitle("CONNECT_BUTTON"), "t.me/mafioznuk_0_0"),
+      callbackButton(ctx.getTitle("BACK_BUTTON"), "back_to_support"),
+    ],
+  ]);
+};
+
+exports.pay_qiwi_keyboard = (ctx, link) => {
+  return inlineKeyboard([[urlButton(ctx.getTitle("PAY_BUTTON"), link)]]);
+};
+
+exports.payment_type_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [callbackButton("🥝QIWI", "qiwi")],
+    [callbackButton("🟢Сбербанк", "sber")],
+    [callbackButton("🔆Тинькофф", "tinkoff")],
+  ]);
+};
+
+exports.no_money_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [callbackButton(ctx.getTitle("GET_MONEY"), "get_money")],
+  ]);
+};
+
+exports.ads_list_keyboard = (ctx, ads) => {
+  const keyboard = inlineKeyboard(
+    ads.map(({ add_id, header }) => callbackButton(header, "add-" + add_id)),
+    { columns: 2 }
+  );
+
+  keyboard.reply_markup.inline_keyboard.push([
+    callbackButton(ctx.getTitle("BUTTON_ADD_ADD"), "addAdd"),
+  ]);
+
+  return keyboard;
+};
+
+exports.wa_keyboard = (ctx, id) => {
+  const keyboard = inlineKeyboard(
+    [callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id)],
+    { columns: 1 }
+  );
+
+  return keyboard;
+};
+
+exports.ga_keyboard = (ctx, id) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id),
+      callbackButton(ctx.getTitle("REJECT_BUTTON"), "reject-" + id),
+    ],
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.update_keyboard = (ctx) => {
+  const keyboard = inlineKeyboard(
+    [callbackButton(ctx.getTitle("UPDATE_BUTTON"), "reload")],
+    { columns: 1 }
+  );
+
+  return keyboard;
+};
+
 exports.new_appointment_keyboard = (ctx) => {
   const keyboard = inlineKeyboard(
     [callbackButton(ctx.getTitle("MAKE_ORDER_BUTTON"), "new_appointment")],
@@ -98,29 +207,15 @@ exports.drop_get_ap_keyboard = (ctx, id) => {
 };
 
 exports.main_menu_keyboard = (ctx) => {
-  const keyboard = inlineKeyboard(
-    [
-      callbackButton(ctx.getTitle("CLIENT_SCENE"), "enter_client"),
-      callbackButton(ctx.getTitle("LAWYER_SCENE"), "enter_lawyer"),
-      callbackButton(ctx.getTitle("ADMIN_SCENE"), "enter_admin"),
-    ],
-    { columns: 3 }
-  );
+  const buttons = [
+    callbackButton(ctx.getTitle("CLIENT_SCENE"), "enter_client"),
+    callbackButton(ctx.getTitle("LAWYER_SCENE"), "enter_lawyer"),
+    callbackButton(ctx.getTitle("ADMIN_SCENE"), "enter_admin"),
+  ];
 
-  return keyboard;
-};
+  if (isAdmin) buttons.push([ctx.getTitle("ADMIN_SCENE_BUTTON")]);
 
-exports.admin_main_keyboard = (ctx) => {
-  const keyboard = inlineKeyboard(
-    [
-      callbackButton(ctx.getTitle("APPOINTMENTS"), "appointments"),
-      callbackButton(ctx.getTitle("LAWYERS"), "lawyers"),
-      callbackButton(ctx.getTitle("PAYMENTS"), "payments"),
-    ],
-    { columns: 2 }
-  );
-
-  return keyboard;
+  return Markup.keyboard(buttons).resize();
 };
 
 exports.admin_main_keyboard_owner = (ctx) => {

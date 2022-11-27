@@ -3,175 +3,239 @@ const {
   titles,
   handlers: { FilesHandler },
 } = require("telegraf-steps-engine");
+const tOrmCon = require("../db/connection");
 
-const clientScene = new CustomWizardScene("clientScene").enter(async (ctx) => {
-  delete ctx.wizard.state.input;
+const scene = new CustomWizardScene("clientScene").enter(async (ctx) => {
+  let userObj = (ctx.scene.state.userObj = await getUser(ctx));
 
-  ctx.replyWithKeyboard("START_TITLE", "new_appointment_keyboard");
-});
+  //const name = getUserName(ctx);
 
-clientScene.action("new_appointment", (ctx) => {
-  ctx.answerCbQuery().catch((e) => {});
-  ctx.replyStep(0);
-});
+  const connection = await tOrmCon;
 
-clientScene
-  .addSelect({
-    variable: "work_type",
-    options: {
-      Расчетка: "Расчетка",
-      "Курсовая работа": "Курсовая работа",
-      "Лабораторная работа": "Лабораторная работа",
-      "Проектная работа": "Проектная работа",
-      "Дипломная работа": "Дипломная работа",
-      "Помощь на экзамене": "Помощь на экзамене",
-      Шпаргалка: "Шпаргалка",
-    },
-  })
-  .addStep({
-    variable: "subject",
-  })
-  .addSelect({
-    variable: "course",
-    options: {
-      "1 курс": "1",
-      "2 курс": "2",
-      "3 курс": "3",
-      "4 курс": "4",
-    },
-  })
-  .addStep({
-    variable: "description",
-  })
-  .addSelect({
-    variable: "deadline",
-    options: {
-      "1-2 дня": "1-2",
-      "1 неделя": "7",
-    },
-    onInput: (ctx) => {
-      if (
-        parseInt(ctx.message.text) != ctx.message.text ||
-        parseInt(ctx.message.text) > 365
-      )
-        return ctx.replyWithTitle("ENTER_NUMBER_DEADLINE");
+  if (!userObj) {
+    const referer_id = /^ref-([0-9]+)$/g.exec(ctx.startPayload)?.[1];
+    userObj = await connection
+      .getRepository("User")
+      .save({
+        id: ctx.from.id,
+        username: ctx.from.username,
+        referer_id,
+      })
+      .catch(async (e) => {
+        console.log(e);
+        ctx.replyWithTitle("DB_ERROR");
+      });
 
-      ctx.wizard.state.input.deadline = ctx.message?.text;
-
-      ctx.replyNextStep();
-    },
-    cb: async (ctx) => {
-      await ctx.answerCbQuery().catch(console.log);
-
-      ctx.wizard.state.input.deadline = ctx.match[0];
-
-      ctx.replyNextStep();
-    },
-  })
-  .addStep({
-    variable: "files",
-    type: "action",
-    skipTo: "promo",
-    handler: new FilesHandler(async (ctx) => {
-      await ctx.answerCbQuery().catch(console.log);
-
-      ctx.wizard.state.enoughMessageSent = false;
-
-      ctx.replyNextStep();
-    }),
-  })
-  .addSelect({
-    variable: "promo",
-    options: {
-      "У меня нет промокода": "no",
-    },
-    onInput: async (ctx) => {
-      ctx.wizard.state.input.promo = ctx.message.text;
-
-      await sendToAdmin(ctx);
-
-      ctx.replyNextStep();
-    },
-    cb: async (ctx) => {
-      await ctx.answerCbQuery().catch(console.log);
-
-      await sendToAdmin(ctx);
-
-      ctx.replyNextStep();
-    },
-  })
-  .addSelect({
-    variable: "ending",
-    options: {
-      "Сделать новый заказ": "new",
-    },
-    cb: async (ctx) => {
-      await ctx.answerCbQuery().catch(console.log);
-
-      if (ctx.match[0] === "new") {
-        delete ctx.wizard.state.input;
-        ctx.replyStep(0);
-      }
-    },
-  });
-
-async function sendToAdmin(ctx) {
-  console.log(ctx.wizard.state);
-
-  const admin_id = ctx.getTitle("ADMIN_ID");
-
-  const username = ctx.from.username ? "@" + ctx.from.username : null;
-
-  let main_message;
-
-  const { work_type, subject, course, description, deadline, promo } =
-    ctx.wizard.state.input;
-
-  if (!username) {
-    const user_message = await ctx.telegram.forwardMessage(
-      admin_id,
-      ctx.from.id,
-      ctx.wizard.state.message_id
-    );
-
-    main_message = await ctx.telegram.sendMessage(
-      admin_id,
-      ctx.getTitle("NEW_APPOINTMENT", [
-        username,
-        work_type,
-        subject,
-        course + " курс",
-        description,
-        deadline.toString() + " дн.",
-        promo ?? "Нет",
-      ]),
-      {
-        reply_to_message_id: user_message?.message_id,
-        parse_mode: "HTML",
-      }
-    );
+    if (referer_id) {
+      connection
+        .createQueryBuilder()
+        .update("User")
+        .set({ balance_gold: () => "balance_gold + 5" })
+        .where({ id: referer_id })
+        .execute()
+        .then((res) => {
+          ctx.telegram.sendMessage(
+            referer_id,
+            ctx.getTitle("NEW_REFERAL", [ctx.from.username])
+          );
+        })
+        .catch(async (e) => {
+          console.log(e);
+          ctx.replyWithTitle("DB_ERROR");
+        });
+    }
   }
 
-  main_message = await ctx.telegram.sendMessage(
-    admin_id,
-    ctx.getTitle("NEW_APPOINTMENT", [
-      username,
-      work_type,
-      subject,
-      course + " курс",
-      description,
-      deadline.toString() + " дн.",
-      promo ?? "Нет",
-    ]),
-    { parse_mode: "HTML" }
+  ctx.replyWithKeyboard(
+    "START_TITLE",
+    {
+      name: "main_keyboard",
+      args: [userObj?.user_id],
+    },
+    [await getCourse(ctx)]
   );
+});
 
-  if (ctx.wizard.state.input?.documents)
-    for (fileId of ctx.wizard.state.input.documents)
-      ctx.telegram.sendDocument(admin_id, fileId, {
-        reply_to_message_id: main_message?.message_id,
-        disable_notification: true,
-      });
+scene.action("connect_support", async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  //ctx.scene.enter("connectSupportScene")
+});
+
+scene.action(/support\_([0-9]*)/g, async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  ctx.replyWithKeyboard(
+    `SUPPORT_ANSWER_${ctx.match[1]}`,
+    "current_support_keyboard"
+  );
+});
+
+scene.action("back_to_support", async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  ctx.replyWithKeyboard("SUPPORT_TITLE", "support_keyboard");
+});
+
+scene.action(["referal_menu", "back_to_referal"], async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  ctx.replyWithKeyboard("REFERAL_TITLE", "referal_keyboard", [ctx.from.id]);
+});
+
+scene.action("my_referals_menu", async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  ctx.replyWithKeyboard("MY_REFERALS_TITLE", "my_referals_keyboard", [
+    userObj?.referers_count,
+  ]);
+});
+
+scene.action("back_to_profile", async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  ctx.replyWithKeyboard("PROFILE_TITLE", "profile_keyboard", [
+    ctx.from.first_name ?? ctx.from.username,
+    ctx.from.id,
+    userObj?.balance_rub,
+    userObj?.balance_gold,
+  ]);
+});
+
+scene.hears(titles.getValues("COURSE_BUTTON"), async (ctx) => {
+  ctx.replyWithTitle("COURSE_TITLE", [await getCourse(ctx)]);
+});
+
+scene.hears(titles.getValues("SUPPORT_BUTTON"), async (ctx) => {
+  ctx.replyWithKeyboard("SUPPORT_TITLE", "support_keyboard");
+});
+
+scene.hears(titles.getValues("PROFILE_BUTTON"), async (ctx) => {
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  ctx.replyWithKeyboard("PROFILE_TITLE", "profile_keyboard", [
+    ctx.from.first_name ?? ctx.from.username,
+    ctx.from.id,
+    userObj?.balance_rub,
+    userObj?.balance_gold,
+    await getGM(ctx),
+    await getWSum(ctx),
+  ]);
+});
+
+scene.hears(titles.getValues("REVIEWS_BUTTON"), async (ctx) => {
+  ctx.replyWithTitle("REVIEWS_TITLE", ["spacegoldnews"]);
+});
+
+scene.hears(titles.getValues("GET_MONEY_BUTTON"), async (ctx) => {
+  ctx.scene.enter("getMoneyScene", {
+    course: await getCourse(ctx),
+    userObj: await getUser(ctx),
+  });
+});
+
+scene.hears(titles.getValues("BUY_GOLD_BUTTON"), async (ctx) => {
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  if (userObj?.balance_rub <= 0) {
+    return ctx.replyWithKeyboard("NO_MONEY", "no_money_keyboard");
+  }
+
+  ctx.scene.enter("buyGoldScene", {
+    course: await getCourse(ctx),
+    userObj,
+  });
+});
+
+scene.action("get_money", async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  ctx.scene.enter("getMoneyScene");
+});
+
+scene.hears(titles.getValues("WITHDRAWAL_BUTTON"), async (ctx) => {
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  if (userObj?.balance_gold < 100) {
+    return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_MORE_W");
+  }
+  ctx.scene.enter("withdrawalScene", {
+    course: await getCourse(ctx),
+    userObj,
+  });
+});
+
+module.exports = [scene];
+
+async function getGM(ctx) {
+  const connection = await tOrmCon;
+
+  let sumObj = await connection
+    .query(
+      `SELECT sum(sum) sum FROM public.get_money_appointments where customer_id = $1 and status = 'aprooved'`,
+      [ctx.from?.id]
+    )
+    .catch((e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+
+  return sumObj?.[0]?.sum;
 }
 
-module.exports = [clientScene];
+async function getWSum(ctx) {
+  const connection = await tOrmCon;
+
+  let sumObj = await connection
+    .query(
+      `SELECT sum(sum) sum FROM public.withdrawal_appointments where customer_id = $1 and status = 'aprooved'`,
+      [ctx.from?.id]
+    )
+    .catch((e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+
+  return sumObj?.[0]?.sum;
+}
+
+async function getUser(ctx) {
+  const connection = await tOrmCon;
+
+  let userObj = await connection
+    .query(
+      `SELECT u.id,user_id, u.username, u.balance_gold, u.balance_rub, count(ur.id) referers_count
+      FROM users u left join admins a on a.user_id = u.id left join users ur on u.id = ur.referer_id
+      where u.id = $1
+      group by u.id, user_id 
+      limit 1`,
+      [ctx.from?.id]
+    )
+    .catch((e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+
+  return userObj?.[0];
+}
+
+async function getCourse(ctx) {
+  const connection = await tOrmCon;
+
+  let staticData = await connection
+    .query(`SELECT course FROM static_data s where s.id = 1 limit 1`)
+    .catch((e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+
+  console.log(staticData);
+  return staticData?.[0]?.course;
+}
+
+const getUserName = (ctx) =>
+  ctx.from?.first_name ?? ctx.from?.username ?? "Друг";

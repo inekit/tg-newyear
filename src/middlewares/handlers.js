@@ -24,11 +24,11 @@ class FilesHandler extends Composer {
   constructor(confirmCb) {
     super();
 
-    //this.on("photo", (ctx) => inputFile(ctx, "photo"));
+    this.on("photo", (ctx) => inputFile(ctx, "photo"));
 
     //this.on('audio', ctx=>inputFile(ctx, "audio"))
 
-    this.on("document", (ctx) => inputFile(ctx, "document"));
+    //this.on("document", (ctx) => inputFile(ctx, "document"));
 
     this.action("confirm", async (ctx) => confirmCb(ctx));
   }
@@ -124,17 +124,9 @@ function inputFile(ctx, type) {
 
   if (!ctx.scene?.state?.input) ctx.scene.state.input = {};
 
-  if (!ctx.scene.state.input?.[type + "s"])
-    ctx.scene.state.input[type + "s"] = [];
+  ctx.wizard.state.input[type + "s"] = file_id;
 
-  ctx.wizard.state.input?.[type + "s"].push(file_id);
-
-  !ctx.wizard.state.enoughMessageSent &&
-    ctx.replyWithKeyboard("ENTER_MORE", "confirm_keyboard");
-
-  ctx.wizard.state.message_id = ctx.message.message_id;
-
-  ctx.wizard.state.enoughMessageSent = true;
+  ctx.replyWithKeyboard("CONFIRM", "confirm_keyboard");
 }
 
 coordinatesHandler.on("location", async (ctx) => await handleLocation(ctx));
