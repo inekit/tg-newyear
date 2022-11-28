@@ -8,12 +8,6 @@ const tOrmCon = require("../../db/connection");
 const scene = new CustomWizardScene("buyGoldScene").enter((ctx) => {
   const { course, userObj } = ctx.scene.state;
 
-  console.log(
-    course,
-    userObj?.balance_rub / course,
-    ((userObj?.balance_rub / course) * 100).toFixed(0)
-  );
-
   ctx.replyWithKeyboard("BUY_GOLD_TITLE", "main_menu_back_keyboard", [
     course,
     userObj?.balance_rub,
