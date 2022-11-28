@@ -144,7 +144,10 @@ roleHandler.action("confirm", async (ctx) => {
   const connection = await tOrmCon;
   await connection
     .getRepository("Admin")
-    .insert({ user_id: newId, canUpdateAdmins })
+    .insert({
+      user_id: newId,
+      canUpdateAdmins: ctx.scene.state.canUpdateAdmins,
+    })
     .then(async () => {
       await ctx.answerCbQuery("ADMIN_HAS_BEEN_ADDED").catch(console.log);
     })

@@ -344,7 +344,7 @@ exports.change_text_actions_keyboard = (ctx) => {
 
 exports.admins_list_keyboard = (ctx, admins) => {
   const keyboard = inlineKeyboard(
-    admins.map(({ userId }) => callbackButton(userId, "admin-" + userId)),
+    admins.map(({ user_id }) => callbackButton(user_id, "admin-" + user_id)),
     { columns: 2 }
   );
 
