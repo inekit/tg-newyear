@@ -11,7 +11,7 @@ const scene = new CustomWizardScene("buyGoldScene").enter((ctx) => {
   ctx.replyWithKeyboard("BUY_GOLD_TITLE", "main_menu_back_keyboard", [
     course,
     userObj?.balance_rub,
-    ((userObj?.balance_rub / 45) * 100).toFixed(0),
+    ((userObj?.balance_rub / course) * 100).toFixed(0),
   ]);
   ctx.wizard.selectStep(0);
 });
@@ -32,7 +32,7 @@ scene.addStep({
     if (userObj?.balance_rub < sum)
       return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_BALANCE");
 
-    const goldSum = ((sum / 45) * 100).toFixed(0);
+    const goldSum = ((sum / course) * 100).toFixed(0);
 
     const connection = await tOrmCon;
 
