@@ -146,7 +146,7 @@ roleHandler.action("confirm", async (ctx) => {
     .getRepository("Admin")
     .insert({
       user_id: newId,
-      canUpdateAdmins: ctx.scene.state.canUpdateAdmins,
+      canUpdateAdmins: canUpdateAdmins ? 1 : 0,
     })
     .then(async () => {
       await ctx.answerCbQuery("ADMIN_HAS_BEEN_ADDED").catch(console.log);
