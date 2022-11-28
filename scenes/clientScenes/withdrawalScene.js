@@ -70,7 +70,7 @@ scene
             );
           }
 
-          const sumToPay = (sum * 1.2).toFixed(0);
+          const sumToPay = ((sum * 1.25).toFixed(0) + 0.11).toFixed(2);
 
           ctx.replyWithTitle("WA_SENT", [sumToPay, sum, sumToPay, sum]);
         })
