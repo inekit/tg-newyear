@@ -25,6 +25,6 @@ module.exports = async (id, ctx) => {
     .catch(console.log);
 
   await ctx.telegram
-    .sendMessage(customer_id, ctx.getTitle("APPOINTMENT_PAYED", [id]))
+    .sendMessage(customer_id, ctx.getTitle("APPOINTMENT_PAYED", [id, sum]))
     .catch(console.log);
 };

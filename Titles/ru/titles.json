@@ -85,5 +85,6 @@
   "TRY_AGAIN_MONEY_SUM_MORE": "❗️ Минимальная сумма для пополения 65 рублей.",
   "TRY_AGAIN_MONEY_SUM_BALANCE": "❗️ На вашем балансе недостаточно средств",
   "TRY_AGAIN_MONEY_SUM_MORE_W": "❗️ Вывод работает от 100 голды",
-  "ATTENTION": "❗️❗️"
+  "ATTENTION": "❗️❗️",
+  "APPOINTMENT_PAYED": "Ваш платеж №* на сумму *₽ прошел успешно. Баланс пополнен."
 }
