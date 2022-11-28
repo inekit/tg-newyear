@@ -80,7 +80,10 @@ scene.action("back_to_support", async (ctx) => {
 scene.action(["referal_menu", "back_to_referal"], async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
 
-  ctx.replyWithKeyboard("REFERAL_TITLE", "referal_keyboard", [ctx.from.id]);
+  ctx.replyWithKeyboard("REFERAL_TITLE", "referal_keyboard", [
+    ctx.botInfo.username,
+    ctx.from.id,
+  ]);
 });
 
 scene.action("my_referals_menu", async (ctx) => {
@@ -103,6 +106,8 @@ scene.action("back_to_profile", async (ctx) => {
     ctx.from.id,
     userObj?.balance_rub,
     userObj?.balance_gold,
+    (await getGM(ctx)) ?? 0,
+    (await getWSum(ctx)) ?? 0,
   ]);
 });
 
@@ -122,8 +127,8 @@ scene.hears(titles.getValues("PROFILE_BUTTON"), async (ctx) => {
     ctx.from.id,
     userObj?.balance_rub,
     userObj?.balance_gold,
-    await getGM(ctx),
-    await getWSum(ctx),
+    (await getGM(ctx)) ?? 0,
+    (await getWSum(ctx)) ?? 0,
   ]);
 });
 
