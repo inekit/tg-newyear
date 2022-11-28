@@ -33,7 +33,7 @@ scene.enter(async (ctx) => {
 
   const keyboard = { name: "wa_keyboard", args: [lastWa.id] };
 
-  const sumToPay = (Number((sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
+  const sumToPay = (Number((lastWa.sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
 
   const title = ctx.getTitle("WA_INFO", [
     lastWa.id,
