@@ -31,6 +31,10 @@ scene.enter(async (ctx) => {
     return ctx.replyWithKeyboard("NO_NEW_WA", "update_keyboard");
   }
 
+  await ctx.replyWithPhoto(lastWa.item_photo_id).catch((e) => {
+    console.log(e);
+  });
+
   const keyboard = { name: "wa_keyboard", args: [lastWa.id] };
 
   const sumToPay = (Number((lastWa.sum * 1.25).toFixed(0)) + 0.11).toFixed(2);

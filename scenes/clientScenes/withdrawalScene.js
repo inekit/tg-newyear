@@ -43,15 +43,29 @@ scene
       if (userObj?.balance_gold < sum)
         return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_BALANCE");
 
-      //ctx.replyStep(1);
+      ctx.wizard.selectStep(1);
+      const sumToPay = (Number((sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
 
+      ctx.replyWithTitle("WA_SENT", [sumToPay, sum, sumToPay, sum]);
+    },
+  })
+  .addStep({
+    variable: "photos",
+    type: "action",
+    handler: new FilesHandler(async (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
+      const { money_sum, payment_type, photos } = ctx.wizard.state.input;
       const connection = await tOrmCon;
+
+      const sum = money_sum;
 
       connection
         .getRepository("WAppointment")
         .save({
           customer_id: ctx.from.id,
-          sum,
+          sum: money_sum,
+          item_photo_id: photos,
           withdrawal_address: "withdrawal_address",
         })
         .then(async (res) => {
@@ -62,6 +76,8 @@ scene
             )
             .catch(console.log);
 
+          ctx.replyWithTitle("WA_SENT_2");
+
           const admins = await connection.getRepository("Admin").find();
           for (admin of admins) {
             ctx.telegram.sendMessage(
@@ -69,22 +85,12 @@ scene
               ctx.getTitle("NEW_W_APPOINTMENT", [ctx, ctx.from.username, sum])
             );
           }
-
-          const sumToPay = (Number((sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
-
-          ctx.replyWithTitle("WA_SENT", [sumToPay, sum, sumToPay, sum]);
         })
         .catch(async (e) => {
           console.log(e);
           ctx.replyWithTitle("DB_ERROR");
         });
-    },
-  })
-  .addStep({
-    variable: "withdrawal_address",
-    cb: async (ctx) => {
-      const withdrawal_address = ctx.message.text;
-    },
+    }),
   });
 
 module.exports = scene;

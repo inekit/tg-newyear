@@ -29,6 +29,11 @@ module.exports = new EntitySchema({
       type: "bigint",
       nullable: false,
     },
+    item_photo_id: {
+      type: "varchar",
+      length: 255,
+      nullable: true,
+    },
     datetime_created: {
       type: "timestamp",
       default: () => "NOW()",
