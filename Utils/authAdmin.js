@@ -5,11 +5,13 @@ module.exports = (tgId, can_update_admins) =>
     if (!tgId) throw new Error("no tg id");
     const connection = await tOrmCon;
     connection
-      .getRepository("Admin")
-      .findOne({ where: { user_id: tgId, can_update_admins } })
+      .query(
+        "select * from admins where user_id = $1 and can_update_admins = true",
+        [tgId]
+      )
       .then((res) => {
         console.log(res);
-        if (res) return resolve(res, connection);
+        if (res?.[0]) return resolve(res, connection);
         reject("NO_SUCH_ADMIN");
       })
       .catch((e) => {
