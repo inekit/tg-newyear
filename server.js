@@ -8,6 +8,8 @@ module.exports = (ctx) => {
   app.post("/exchange", express.json({ type: "*/*" }), async (req, res) => {
     const { bill } = req.body;
 
+    console.log(bill, 111, req.body);
+
     if (!bill?.billId) return;
 
     await res.sendStatus(200);

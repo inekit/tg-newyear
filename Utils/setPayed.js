@@ -13,6 +13,8 @@ module.exports = async (id, ctx) => {
   const customer_id = cIdObj?.[0]?.[0]?.customer_id;
   const sum = cIdObj?.[0]?.[0]?.sum;
 
+  console.log(id, customer_id, sum);
+
   if (!customer_id) return;
 
   await connection
@@ -22,8 +24,7 @@ module.exports = async (id, ctx) => {
     ])
     .catch(console.log);
 
-  await ctx.telegram.sendMessage(
-    customer_id,
-    ctx.getTitle("APPOINTMENT_PAYED", [id])
-  );
+  await ctx.telegram
+    .sendMessage(customer_id, ctx.getTitle("APPOINTMENT_PAYED", [id]))
+    .catch(console.log);
 };
