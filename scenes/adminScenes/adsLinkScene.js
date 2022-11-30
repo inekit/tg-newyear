@@ -95,14 +95,12 @@ scene
         let message = await ctx.telegram
           .sendMessage(
             user.id,
-            text
-              .replaceAll(
-                /(\#)/g,
-                function replacer(match, p1, offset, string) {
-                  return `\\${p1}`;
-                }
-              )
-              .replaceAll(".", "\\."),
+            text.replaceAll(
+              /(\#)|(\.)|(\+)|(\=)|(\-)|(\*)|(\!)|(\?)|(\,)|(\()|(\))|(\%)|(\@)|(\~)|(\;)|(\^)|(\&)|(\")|(\:)|(\')$/g,
+              function replacer(match, p1, offset, string) {
+                return `\\${match}`;
+              }
+            ),
             {
               parse_mode: "MarkdownV2",
               reply_markup: kbs.length
