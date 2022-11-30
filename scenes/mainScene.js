@@ -227,9 +227,9 @@ async function getUser(ctx) {
 
   console.log(
     "balance_log gold rub id",
-    userObj?.[0].balance_gold,
-    userObj?.[0].balance_rub,
-    userObj?.[0].id
+    userObj?.[0]?.balance_gold,
+    userObj?.[0]?.balance_rub,
+    userObj?.[0]?.id
   );
 
   return userObj?.[0];
