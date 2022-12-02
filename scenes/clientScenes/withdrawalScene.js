@@ -10,6 +10,8 @@ const tOrmCon = require("../../db/connection");
 const scene = new CustomWizardScene("withdrawalScene").enter(async (ctx) => {
   const { course, userObj } = ctx.scene.state;
 
+  ctx.scene.state.sent = false;
+
   if (userObj?.balance_gold <= 0) {
     //await ctx.replyWithKeyboard("ATTENTION", "main_menu_back_keyboard");
     return ctx.replyWithTitle("NO_MONEY"); //, "no_money_keyboard");
@@ -55,6 +57,8 @@ scene
     handler: new FilesHandler(async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
+      if (ctx.scene.state.sent) return;
+
       const { money_sum, payment_type, photos } = ctx.wizard.state.input;
       const connection = await tOrmCon;
 
@@ -74,17 +78,24 @@ scene
               "update users set balance_gold = balance_gold - $1 where id = $2",
               [sum, ctx.from.id]
             )
+            .then(async (res) => {
+              ctx.scene.state.sent = true;
+
+              ctx.replyWithTitle("WA_SENT_2");
+
+              const admins = await connection.getRepository("Admin").find();
+              for (admin of admins) {
+                ctx.telegram.sendMessage(
+                  admin.user_id,
+                  ctx.getTitle("NEW_W_APPOINTMENT", [
+                    ctx,
+                    ctx.from.username,
+                    sum,
+                  ])
+                );
+              }
+            })
             .catch(console.log);
-
-          ctx.replyWithTitle("WA_SENT_2");
-
-          const admins = await connection.getRepository("Admin").find();
-          for (admin of admins) {
-            ctx.telegram.sendMessage(
-              admin.user_id,
-              ctx.getTitle("NEW_W_APPOINTMENT", [ctx, ctx.from.username, sum])
-            );
-          }
         })
         .catch(async (e) => {
           console.log(e);

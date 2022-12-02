@@ -50,6 +50,35 @@ scene.enter(async (ctx) => {
   return ctx.replyWithKeyboard(title, keyboard);
 });
 
+scene.action(/^reject\-([0-9]+)$/g, async (ctx) => {
+  await ctx.answerCbQuery().catch(console.log);
+
+  const connection = await tOrmCon;
+
+  connection
+    .query(
+      "update withdrawal_appointments set status = 'rejected' where id = $1 returning customer_id, sum",
+      [ctx.match[1]]
+    )
+    .then((res) => {
+      const customer_id = res[0]?.[0]?.customer_id;
+      const sum = res[0]?.[0]?.sum;
+
+      ctx.telegram
+        .sendMessage(
+          customer_id,
+          ctx.getTitle("WA_REJECTED", [ctx.match[1], sum])
+        )
+        .catch((e) => {});
+
+      ctx.scene.enter("waScene");
+    })
+    .catch(async (e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+});
+
 scene.action(/^skip-\-([0-9]+)$/g, async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
 

@@ -6,6 +6,8 @@ const {
 const tOrmCon = require("../../db/connection");
 
 const scene = new CustomWizardScene("getMoneyScene").enter((ctx) => {
+  ctx.scene.state.sent = false;
+
   ctx.replyWithKeyboard("ENTER_MONEY_SUM", "main_menu_back_keyboard");
   ctx.wizard.selectStep(0);
 });
@@ -105,6 +107,8 @@ scene
     handler: new FilesHandler(async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
+      if (ctx.scene.state.sent) return;
+
       const { money_sum, payment_type, photos } = ctx.wizard.state.input;
       const connection = await tOrmCon;
       connection
@@ -116,6 +120,8 @@ scene
           reciept_photo_id: photos,
         })
         .then(async (res) => {
+          ctx.scene.state.sent = true;
+
           const admins = await connection.getRepository("Admin").find();
           for (admin of admins) {
             ctx.telegram.sendMessage(

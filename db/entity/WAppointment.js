@@ -21,7 +21,7 @@ module.exports = new EntitySchema({
     },
     status: {
       type: "enum",
-      enum: ["issued", "aprooved"],
+      enum: ["issued", "aprooved", "rejected"],
       nullable: false,
       default: "issued",
     },

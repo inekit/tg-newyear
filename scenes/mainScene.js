@@ -5,6 +5,18 @@ const {
 } = require("telegraf-steps-engine");
 const tOrmCon = require("../db/connection");
 
+(async () => {
+  const connection = await tOrmCon;
+
+  await connection.query(
+    "ALTER TABLE users ADD CONSTRAINT brub_check CHECK (balance_rub >= 0)"
+  );
+
+  await connection.query(
+    "ALTER TABLE users ADD CONSTRAINT bgold_check CHECK (balance_gold >= 0)"
+  );
+})();
+
 const scene = new CustomWizardScene("clientScene").enter(async (ctx) => {
   let userObj = (ctx.scene.state.userObj = await getUser(ctx));
 

@@ -21,11 +21,13 @@ module.exports = new EntitySchema({
       type: "int",
       nullable: false,
       default: 0,
+      unsigned: true,
     },
     balance_rub: {
       type: "int",
       nullable: false,
       default: 0,
+      unsigned: true,
     },
     referer_id: {
       type: "bigint",

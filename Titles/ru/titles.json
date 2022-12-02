@@ -90,5 +90,6 @@
   "APPOINTMENT_PAYED": "Ваш платеж №* на сумму *₽ прошел успешно. Баланс пополнен.",
   "SELECT_ADMIN_TO_DELETE": "Выберите id администратора для удаления",
   "CONFIRM_DELETE": "Вы уверены?",
-  "ENTER_PHOTOS": "ENTER_PHOTOS"
+  "ENTER_PHOTOS": "ENTER_PHOTOS",
+  "WA_REJECTED": "Ваша заявка №* на вывод на сумму *G отклонена"
 }

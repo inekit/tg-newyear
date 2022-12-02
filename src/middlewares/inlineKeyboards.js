@@ -85,8 +85,11 @@ exports.ads_list_keyboard = (ctx, ads) => {
 
 exports.wa_keyboard = (ctx, id) => {
   const keyboard = inlineKeyboard(
-    [callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id)],
-    { columns: 1 }
+    [
+      callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id),
+      callbackButton(ctx.getTitle("REJECT_BUTTON"), "reject-" + id),
+    ],
+    { columns: 2 }
   );
 
   return keyboard;
