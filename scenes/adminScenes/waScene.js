@@ -64,6 +64,13 @@ scene.action(/^reject\-([0-9]+)$/g, async (ctx) => {
       const customer_id = res[0]?.[0]?.customer_id;
       const sum = res[0]?.[0]?.sum;
 
+      connection
+        .query(
+          "update users set balance_gold = balance_gold + $2 where id = $1",
+          [customer_id, sum]
+        )
+        .catch(console.log);
+
       ctx.telegram
         .sendMessage(
           customer_id,
