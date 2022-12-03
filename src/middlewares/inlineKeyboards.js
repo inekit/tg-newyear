@@ -88,6 +88,7 @@ exports.wa_keyboard = (ctx, id) => {
     [
       callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id),
       callbackButton(ctx.getTitle("REJECT_BUTTON"), "reject-" + id),
+      callbackButton(ctx.getTitle("WAIT_BUTTON"), "wait-" + id),
     ],
     { columns: 2 }
   );

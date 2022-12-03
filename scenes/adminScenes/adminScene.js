@@ -38,7 +38,11 @@ scene.hears(titles.getValues("BUTTON_ADMINS"), (ctx) =>
 );
 
 scene.hears(titles.getValues("BUTTON_WA"), (ctx) =>
-  ctx.scene.enter("waScene", { main_menu_button })
+  ctx.scene.enter("waScene", { main_menu_button, waiting: false })
+);
+
+scene.hears(titles.getValues("BUTTON_WA_WAIT"), (ctx) =>
+  ctx.scene.enter("waScene", { main_menu_button, waiting: true })
 );
 
 scene.hears(titles.getValues("BUTTON_GA"), (ctx) =>

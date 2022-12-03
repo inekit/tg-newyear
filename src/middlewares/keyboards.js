@@ -56,7 +56,8 @@ exports.main_keyboard = (ctx, isAdmin) => {
 exports.admin_keyboard = (ctx) =>
   Markup.keyboard([
     [ctx.getTitle("BUTTON_ADD")],
-    [ctx.getTitle("BUTTON_WA"), ctx.getTitle("BUTTON_GA")],
+    [ctx.getTitle("BUTTON_WA"), ctx.getTitle("BUTTON_WA_WAIT")],
+    [ctx.getTitle("BUTTON_GA")],
     [ctx.getTitle("BUTTON_COURSE")],
     [ctx.getTitle("BUTTON_ADMINS")],
     [ctx.getTitle("BUTTON_CLIENT_MENU")],

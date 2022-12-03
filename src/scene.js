@@ -147,6 +147,6 @@ module.exports = class CustomWizardScene extends BaseScene {
     };
     if (this.enterHandler.toString().length === 21)
       this.enterHandler = async (ctx, next) => replyFirst();
-    return Composer.compose([this.middleware(true), enterAndReply]);
+    return Composer.compose([enterAndReply, this.middleware(true)]);
   }
 };

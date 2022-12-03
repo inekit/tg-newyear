@@ -3,13 +3,16 @@ const {
   Composer,
   Scenes: { WizardScene },
 } = require("telegraf");
-const sendResHandler = new Composer(),
-  confirmHandler = new Composer();
+const {
+  CustomWizardScene,
+  titles,
+  createKeyboard,
+  handlers: { FilesHandler },
+} = require("telegraf-steps-engine");
+
 const tOrmCon = require("../../db/connection");
 
-const scene = new WizardScene("gaScene", sendResHandler, confirmHandler);
-
-scene.enter(async (ctx) => {
+const scene = new CustomWizardScene("gaScene").enter(async (ctx) => {
   let { edit, main_menu_button } = ctx.scene.state;
 
   const connection = await tOrmCon;
@@ -42,30 +45,9 @@ scene.enter(async (ctx) => {
 scene.action(/^reject\-([0-9]+)$/g, async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
 
-  const connection = await tOrmCon;
+  ctx.wizard.state.appointment_id = ctx.match[1];
 
-  connection
-    .query(
-      "update get_money_appointments set status = 'rejected' where id = $1 returning customer_id, sum",
-      [ctx.match[1]]
-    )
-    .then((res) => {
-      const customer_id = res[0]?.[0]?.customer_id;
-      const sum = res[0]?.[0]?.sum;
-
-      ctx.telegram
-        .sendMessage(
-          customer_id,
-          ctx.getTitle("GA_REJECTED", [ctx.match[1], sum])
-        )
-        .catch((e) => {});
-
-      ctx.scene.enter("gaScene");
-    })
-    .catch(async (e) => {
-      console.log(e);
-      ctx.replyWithTitle("DB_ERROR");
-    });
+  ctx.replyStep(1);
 });
 
 scene.action("reload", async (ctx) => {
@@ -77,8 +59,6 @@ scene.action("reload", async (ctx) => {
 scene.action(/^aproove\-([0-9]+)$/g, async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
 
-  //ctx.wizard.state.claim_id = ctx.match[1];
-
   const connection = await tOrmCon;
 
   connection
@@ -86,23 +66,25 @@ scene.action(/^aproove\-([0-9]+)$/g, async (ctx) => {
       "update get_money_appointments set status = 'aprooved' where id = $1 returning customer_id, sum",
       [ctx.match[1]]
     )
-    .then((res) => {
+    .then(async (res) => {
       const customer_id = res[0]?.[0]?.customer_id;
       const sum = res[0]?.[0]?.sum;
 
-      connection
+      await connection
         .query(
           "update users set balance_rub = balance_rub + $1 where id = $2",
           [sum, customer_id]
         )
         .catch(console.log);
 
-      ctx.telegram
+      await ctx.telegram
         .sendMessage(
           customer_id,
           ctx.getTitle("GA_APROOVED", [ctx.match[1], sum])
         )
         .catch((e) => {});
+
+      delete ctx.wizard.state;
 
       ctx.scene.enter("gaScene");
     })
@@ -111,5 +93,61 @@ scene.action(/^aproove\-([0-9]+)$/g, async (ctx) => {
       ctx.replyWithTitle("DB_ERROR");
     });
 });
+
+async function rejectAppointment(ctx) {
+  const appointment_id = ctx.wizard.state.appointment_id;
+  const reason = ctx.wizard.state.reason;
+  const reasonMes = reason ? "\n\n Причина: " + reason : " ";
+
+  const connection = await tOrmCon;
+
+  connection
+    .query(
+      "update get_money_appointments set status = 'rejected' where id = $1 returning customer_id, sum",
+      [appointment_id]
+    )
+    .then(async (res) => {
+      const customer_id = res[0]?.[0]?.customer_id;
+      const sum = res[0]?.[0]?.sum;
+
+      await ctx.telegram
+        .sendMessage(
+          customer_id,
+          ctx.getTitle("GA_REJECTED", [appointment_id, sum, reasonMes])
+        )
+        .catch((e) => {});
+
+      delete ctx.wizard.state;
+      ctx.scene.enter("gaScene");
+    })
+    .catch(async (e) => {
+      console.log(e);
+      ctx.replyWithTitle("DB_ERROR");
+    });
+}
+
+scene
+  .addStep({
+    variable: "none",
+    cb: (ctx) => {},
+  })
+  .addSelect({
+    variable: "reason",
+    options: { "Без причины": "no" },
+    cb: async (ctx) => {
+      await ctx.answerCbQuery().catch(console.log);
+
+      rejectAppointment(ctx);
+    },
+    onInput: (ctx) => {
+      ctx.wizard.state.reason = ctx.message.text;
+
+      rejectAppointment(ctx);
+    },
+  })
+  .addStep({
+    variable: "none2",
+    cb: (ctx) => {},
+  });
 
 module.exports = scene;
