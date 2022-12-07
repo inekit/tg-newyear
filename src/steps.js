@@ -97,6 +97,16 @@ class Steps {
     this.stepsArray.push(new Step(obj));
   }
 
+  addNullStep = () => {
+    this.addStep({
+      type: "input",
+      variable: "none",
+      cb: () => {},
+    });
+
+    return this;
+  };
+
   addSelect = ({
     variable,
     header,

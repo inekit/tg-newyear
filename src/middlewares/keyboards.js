@@ -39,13 +39,13 @@ exports.main_menu_admin_keyboard = (ctx) => {
 
 exports.main_keyboard = (ctx, isAdmin) => {
   const buttons = [
-    ctx.getTitle("GET_MONEY_BUTTON"),
-    ctx.getTitle("BUY_GOLD_BUTTON"),
-    ctx.getTitle("WITHDRAWAL_BUTTON"),
-    ctx.getTitle("SUPPORT_BUTTON"),
+    ctx.getTitle("TASKS_BUTTON"),
+    ctx.getTitle("INTERNAL_TASKS_BUTTON"),
     ctx.getTitle("PROFILE_BUTTON"),
-    ctx.getTitle("COURSE_BUTTON"),
-    ctx.getTitle("REVIEWS_BUTTON"),
+    ctx.getTitle("HELP_BUTTON"),
+    ctx.getTitle("REFERALS_BUTTON"),
+    ctx.getTitle("REPORT_BUTTON"),
+    ctx.getTitle("WITHDRAWAL_BUTTON"),
   ];
 
   if (isAdmin) buttons.push(ctx.getTitle("BUTTON_BACK_ADMIN"));
@@ -57,18 +57,18 @@ exports.admin_keyboard = (ctx) =>
   Markup.keyboard([
     [ctx.getTitle("BUTTON_ADD")],
     [ctx.getTitle("BUTTON_WA"), ctx.getTitle("BUTTON_WA_WAIT")],
-    [ctx.getTitle("BUTTON_GA")],
-    [ctx.getTitle("BUTTON_COURSE")],
+    [ctx.getTitle("BUTTON_ANSWERS"), ctx.getTitle("BUTTON_REPORTS")],
+    [ctx.getTitle("BUTTON_BALANCE"), ctx.getTitle("BUTTON_CATALOG")],
     [ctx.getTitle("BUTTON_ADMINS")],
     [ctx.getTitle("BUTTON_CLIENT_MENU")],
   ]).resize();
 
-exports.categories_list_keyboard_bottom = (ctx, data, totalStr) => {
+exports.categories_list_keyboard_bottom = (ctx, data) => {
   const categoryButtons = data?.map((name) => {
     return [name];
   });
 
-  categoryButtons?.push([totalStr]);
+  //categoryButtons?.push([totalStr]);
 
   return Markup.keyboard(categoryButtons).resize();
 };
@@ -88,9 +88,9 @@ exports.admin_main_keyboard_owner = (ctx) =>
     [ctx.getTitle("BUTTON_CLIENT_MENU")],
   ]).resize();*/
 
-exports.main_menu_goback_keyboard = (ctx) =>
+exports.main_menu_goback_tasks_keyboard = (ctx) =>
   Markup.keyboard(
-    [ctx.getTitle("BUTTON_GO_BACK"), ctx.getTitle("BUTTON_MAIN_MENU")],
+    [ctx.getTitle("BUTTON_GO_BACK_TASKS"), ctx.getTitle("BUTTON_BACK_USER")],
     { columns: 1 }
   ).resize();
 

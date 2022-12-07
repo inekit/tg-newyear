@@ -1,38 +1,32 @@
 var EntitySchema = require("typeorm").EntitySchema;
 
 module.exports = new EntitySchema({
-  name: "GetMoneyAppointment",
-  tableName: "get_money_appointments",
+  name: "Report",
+  tableName: "reports",
   columns: {
     id: {
       primary: true,
       type: "int",
       generated: true,
     },
-    bank: {
+    status: {
       type: "enum",
-      enum: ["sber", "tinkoff", "qiwi"],
+      enum: ["issued", "aprooved", "rejected", "waiting"],
       nullable: false,
+      default: "issued",
     },
-    sum: {
+    item_id: {
       type: "int",
-      nullable: false,
+      nullable: true,
     },
-    reciept_photo_id: {
+    item_photo_id: {
       type: "varchar",
       length: 255,
       nullable: true,
     },
-    status: {
-      type: "enum",
-      enum: ["issued", "aprooved", "notpayed", "rejected"],
-      nullable: false,
-      default: "issued",
-    },
     customer_id: {
       type: "bigint",
       nullable: false,
-      default: 296846972,
     },
     datetime_created: {
       type: "timestamp",
@@ -42,6 +36,14 @@ module.exports = new EntitySchema({
   relations: {
     customer: {
       target: "User",
+      type: "one-to-many",
+      cascade: true,
+      joinColumn: true,
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    },
+    item: {
+      target: "Item",
       type: "one-to-many",
       cascade: true,
       joinColumn: true,

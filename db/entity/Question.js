@@ -1,39 +1,41 @@
 var EntitySchema = require("typeorm").EntitySchema;
 
 module.exports = new EntitySchema({
-  name: "User",
-  tableName: "users",
+  name: "Question",
+  tableName: "questions",
   columns: {
     id: {
       primary: true,
-      type: "bigint",
+      type: "int",
+      generated: true,
     },
-    username: {
+    text: {
       type: "varchar",
       length: 255,
-      nullable: true,
-    },
-    last_use: {
-      type: "date",
-      nullable: true,
-    },
-    balance_rub: {
-      type: "int",
       nullable: false,
-      default: 0,
     },
-    referer_id: {
+    status: {
+      type: "enum",
+      enum: ["sent", "answered"],
+      nullable: false,
+      default: "sent",
+    },
+    customer_id: {
       type: "bigint",
-      nullable: true,
+      nullable: false,
+    },
+    datetime_sent: {
+      type: "timestamp",
+      default: () => "NOW()",
     },
   },
   relations: {
-    referer: {
+    customer: {
       target: "User",
       type: "one-to-many",
       cascade: true,
       joinColumn: true,
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     },
   },

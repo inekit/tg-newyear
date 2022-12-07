@@ -4,6 +4,119 @@ const callbackButton = Markup.button.callback;
 const urlButton = Markup.button.url;
 const { inlineKeyboard } = Markup;
 
+exports.items_list_keyboard = (ctx, ads) => {
+  const keyboard = inlineKeyboard(
+    ads.map(({ id, name, price }) =>
+      callbackButton(name + " " + price + "р", "item-" + id)
+    ),
+    { columns: 1 }
+  );
+
+  keyboard.reply_markup.inline_keyboard.push([
+    callbackButton(ctx.getTitle("BUTTON_BACK"), "back"),
+  ]);
+
+  return keyboard;
+};
+
+exports.reports_list_keyboard = (ctx, ads) => {
+  const keyboard = inlineKeyboard(
+    ads.map(({ id, name, price }) =>
+      callbackButton(id + " " + (price ? price + "р" : ""), "item-" + id)
+    ),
+    { columns: 1 }
+  );
+
+  return keyboard;
+};
+
+exports.categories_list_keyboard = (ctx, ads) => {
+  const keyboard = inlineKeyboard(
+    ads.map(({ id, name }) => callbackButton(name, "category-" + id)),
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.questions_keyboard = (ctx, questions) => {
+  const keyboard = inlineKeyboard(
+    questions.map(({ customer_id, username }) =>
+      callbackButton(username ?? customer_id, "question_" + customer_id)
+    ),
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.item_keyboard_admin = (ctx, cardId) => {
+  const keyboard = inlineKeyboard(
+    [
+      callbackButton(ctx.getTitle("BUTTON_EDIT"), `edit-item-${cardId}`),
+      callbackButton(ctx.getTitle("BUTTON_DELETE"), `delete-item-${cardId}`),
+      callbackButton(ctx.getTitle("BUTTON_BACK"), "back"),
+    ],
+    { columns: 2 }
+  );
+
+  return keyboard;
+};
+
+exports.categories_list_admin_keyboard = (ctx, data, prefix, cardId) => {
+  const keyboard = inlineKeyboard(
+    data.map(({ name, id }) => callbackButton(name, prefix + "-" + id)),
+    { columns: 2 }
+  );
+
+  keyboard.reply_markup.inline_keyboard.push([
+    callbackButton(
+      ctx.getTitle(`BUTTON_ADD_${prefix.toUpperCase()}`),
+      `add-${prefix}-${cardId ?? 0}`
+    ),
+  ]);
+  const p2 =
+    prefix === "item" ? "category" : prefix === "subcategory" ? "category" : "";
+
+  if (prefix === "subcategory" || prefix === "item")
+    keyboard.reply_markup.inline_keyboard.push(
+      [
+        callbackButton(ctx.getTitle("BUTTON_EDIT"), `edit-${p2}-${cardId}`),
+        callbackButton(ctx.getTitle("BUTTON_DELETE"), `delete-${p2}-${cardId}`),
+      ],
+      [callbackButton(ctx.getTitle("BUTTON_BACK"), "back")]
+    );
+  return keyboard;
+};
+
+exports.balance_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [callbackButton(ctx.getTitle("GET_BALANCE_BUTTON"), "search")],
+  ]);
+};
+
+exports.change_balance_keyboard = (ctx) => {
+  return inlineKeyboard([
+    [callbackButton(ctx.getTitle("CHANGE_BALANCE_BUTTON"), "change")],
+  ]);
+};
+
+exports.item_keyboard = (ctx, id, link) => {
+  return inlineKeyboard([
+    [urlButton(ctx.getTitle("OPEN_SITE_BUTTON"), link)],
+    [callbackButton(ctx.getTitle("TASK_INSTRUCTIONS"), "instruction_" + id)],
+    [callbackButton(ctx.getTitle("TASK_DONE"), "done_" + id)],
+    [callbackButton(ctx.getTitle("BUTTON_BACK"), "back")],
+  ]);
+};
+
+exports.instruction_keyboard = (ctx, id, link) => {
+  return inlineKeyboard([
+    [urlButton(ctx.getTitle("OPEN_SITE_BUTTON"), link)],
+    [callbackButton(ctx.getTitle("TASK_DONE"), "done_" + id)],
+  ]);
+};
+
 exports.profile_keyboard = (ctx, id) => {
   return inlineKeyboard([
     callbackButton(ctx.getTitle("REFERAL_BUTTON"), "referal_menu"),
@@ -23,23 +136,35 @@ exports.my_referals_keyboard = (ctx, id) => {
   ]);
 };
 
-exports.support_keyboard = (ctx) => {
+exports.tasks_keyboard = (ctx, link, type, instruction = false) => {
+  const keyboard = inlineKeyboard([
+    [urlButton(ctx.getTitle("OPEN_SITE_BUTTON"), link)],
+  ]);
+
+  instruction
+    ? keyboard.reply_markup.inline_keyboard.push(
+        [callbackButton(ctx.getTitle("TASK_DONE"), "done_" + type)],
+        [callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_tasks")]
+      )
+    : keyboard.reply_markup.inline_keyboard.push(
+        [
+          callbackButton(
+            ctx.getTitle("TASK_INSTRUCTIONS"),
+            "instructions_" + type
+          ),
+        ],
+        [callbackButton(ctx.getTitle("TASK_DONE"), "done_" + type)],
+        [callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_tasks")]
+      );
+
+  return keyboard;
+};
+
+exports.help_keyboard = (ctx) => {
   return inlineKeyboard([
-    [
-      callbackButton("1", "support_1"),
-      callbackButton("2", "support_2"),
-      callbackButton("3", "support_3"),
-    ],
-    [
-      callbackButton("4", "support_4"),
-      callbackButton("5", "support_5"),
-      callbackButton("6", "support_6"),
-    ],
-    [
-      callbackButton("7", "support_7"),
-      //callbackButton(ctx.getTitle("CONNECT_BUTTON"), "connect_support"),
-      urlButton(ctx.getTitle("CONNECT_BUTTON"), "t.me/mafioznuk_0_0"),
-    ],
+    [callbackButton(ctx.getTitle("CONNECT_BUTTON"), "connect_support")],
+    [callbackButton(ctx.getTitle("HELP_INFO_BUTTON"), "help_info")],
+    [callbackButton(ctx.getTitle("HELP_RULES_BUTTON"), "rules_info")],
   ]);
 };
 
@@ -96,7 +221,7 @@ exports.wa_keyboard = (ctx, id) => {
   return keyboard;
 };
 
-exports.ga_keyboard = (ctx, id) => {
+exports.reports_keyboard = (ctx, id) => {
   const keyboard = inlineKeyboard(
     [
       callbackButton(ctx.getTitle("APROOVE_BUTTON"), "aproove-" + id),
@@ -433,6 +558,40 @@ exports.confirm_cancel_keyboard = (ctx) =>
     ],
     { columns: 1 }
   );
+
+exports.go_back_help_keyboard = (ctx) =>
+  inlineKeyboard([
+    callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_help"),
+  ]);
+exports.go_back_subhelp_keyboard = (ctx) =>
+  inlineKeyboard([
+    callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_subhelp"),
+  ]);
+
+exports.subhelp_keyboard = (ctx) =>
+  inlineKeyboard([
+    [callbackButton(ctx.getTitle("INFO_BALANCE_BUTTON"), "help_info_balance")],
+    [
+      callbackButton(
+        ctx.getTitle("INFO_REFERALS_BUTTON"),
+        "help_info_referals"
+      ),
+    ],
+    [callbackButton(ctx.getTitle("INFO_HOLD_BUTTON"), "help_info_hold")],
+    [
+      callbackButton(
+        ctx.getTitle("INFO_WITHDRAWAL_BUTTON"),
+        "help_info_withdrawal"
+      ),
+    ],
+
+    [callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_help")],
+  ]);
+
+exports.go_back_tasks_keyboard = (ctx) =>
+  inlineKeyboard([
+    callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back_tasks"),
+  ]);
 
 exports.go_back_keyboard = (ctx) =>
   inlineKeyboard([callbackButton(ctx.getTitle("BUTTON_GO_BACK"), "go_back")]);

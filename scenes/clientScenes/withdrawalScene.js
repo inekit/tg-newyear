@@ -6,15 +6,22 @@ const {
 } = require("telegraf-steps-engine");
 const { replyWithTitle } = require("telegraf-steps-engine/shortcuts/shortcuts");
 const tOrmCon = require("../../db/connection");
+const getUser = require("../../Utils/getUser");
 
 const scene = new CustomWizardScene("withdrawalScene").enter(async (ctx) => {
-  const { course, userObj } = ctx.scene.state;
+  const { course } = ctx.scene.state;
+
+  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
+
+  if (userObj?.balance_rub < 10) {
+    await ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_MORE_W");
+    return ctx.scene.enter("clientScene", { visual: false });
+  }
 
   ctx.scene.state.sent = false;
 
-  if (userObj?.balance_gold <= 0) {
-    //await ctx.replyWithKeyboard("ATTENTION", "main_menu_back_keyboard");
-    return ctx.replyWithTitle("NO_MONEY"); //, "no_money_keyboard");
+  if (userObj?.balance_rub <= 0) {
+    return ctx.replyWithTitle("NO_MONEY");
   }
 
   ctx.replyWithKeyboard(
@@ -22,7 +29,7 @@ const scene = new CustomWizardScene("withdrawalScene").enter(async (ctx) => {
     "main_menu_back_keyboard"
   );
 
-  ctx.wizard.selectStep(0);
+  ctx.wizard?.selectStep(0);
 });
 
 scene
@@ -30,36 +37,38 @@ scene
     variable: "withdrawal_money_sum",
     confines: ["number"],
     cb: async (ctx) => {
-      ctx.wizard.state.input = {};
-
       const { course, userObj } = ctx.scene.state;
+
+      ctx.wizard.state.input = {};
 
       const sum = (ctx.wizard.state.input.money_sum = ctx.message.text);
 
       if (parseInt(sum) != sum)
         return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM");
 
-      if (parseInt(sum) < 100)
+      if (parseInt(sum) < 10)
         return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_MORE_W");
 
-      if (userObj?.balance_gold < sum)
+      if (userObj?.balance_rub < sum)
         return ctx.replyWithTitle("TRY_AGAIN_MONEY_SUM_BALANCE");
 
-      ctx.wizard.selectStep(1);
-      const sumToPay = (Number((sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
-
-      ctx.replyWithTitle("WA_SENT", [sumToPay, sum, sumToPay, sum]);
+      ctx.replyNextStep();
     },
   })
   .addStep({
-    variable: "photos",
-    type: "action",
-    handler: new FilesHandler(async (ctx) => {
-      await ctx.answerCbQuery().catch(console.log);
+    variable: "card_number",
+    confines: ["number"],
+    cb: async (ctx) => {
+      const { course, userObj } = ctx.scene.state;
+
+      const card_number = ctx.message.text;
+
+      if (parseInt(card_number) != card_number)
+        return ctx.replyWithTitle("TRY_AGAIN_CARD_NUMBER");
 
       if (ctx.scene.state.sent) return;
 
-      const { money_sum, payment_type, photos } = ctx.wizard.state.input;
+      const { money_sum } = ctx.wizard.state.input;
       const connection = await tOrmCon;
 
       const sum = money_sum;
@@ -69,13 +78,12 @@ scene
         .save({
           customer_id: ctx.from.id,
           sum: money_sum,
-          item_photo_id: photos,
-          withdrawal_address: "withdrawal_address",
+          withdrawal_address: card_number,
         })
         .then(async (res) => {
           connection
             .query(
-              "update users set balance_gold = balance_gold - $1 where id = $2",
+              "update users set balance_rub = balance_rub - $1 where id = $2 returning balance_rub",
               [sum, ctx.from.id]
             )
             .then(async (res) => {
@@ -91,6 +99,7 @@ scene
                     ctx,
                     ctx.from.username,
                     sum,
+                    card_number,
                   ])
                 );
               }
@@ -101,7 +110,7 @@ scene
           console.log(e);
           ctx.replyWithTitle("DB_ERROR");
         });
-    }),
+    },
   });
 
 module.exports = scene;

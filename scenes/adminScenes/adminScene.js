@@ -45,8 +45,20 @@ scene.hears(titles.getValues("BUTTON_WA_WAIT"), (ctx) =>
   ctx.scene.enter("waScene", { main_menu_button, waiting: true })
 );
 
-scene.hears(titles.getValues("BUTTON_GA"), (ctx) =>
-  ctx.scene.enter("gaScene", { main_menu_button })
+scene.hears(titles.getValues("BUTTON_REPORTS"), (ctx) =>
+  ctx.scene.enter("reportsScene", { main_menu_button })
+);
+
+scene.hears(titles.getValues("BUTTON_ANSWERS"), (ctx) =>
+  ctx.scene.enter("answerQuestionScene", { main_menu_button })
+);
+
+scene.hears(titles.getValues("BUTTON_CATALOG"), (ctx) =>
+  ctx.scene.enter("categoriesScene", { main_menu_button })
+);
+
+scene.hears(titles.getValues("BUTTON_BALANCE"), (ctx) =>
+  ctx.scene.enter("changeBalanceScene", { main_menu_button })
 );
 
 scene.hears(titles.getValues("BUTTON_GA"), (ctx) =>

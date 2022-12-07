@@ -42,6 +42,12 @@ module.exports = class CustomWizardScene extends BaseScene {
     return this;
   };
 
+  addNullStep = () => {
+    this.steps.addNullStep();
+
+    return this;
+  };
+
   addHandler = (handler) => {
     this.steps.addStep(handler);
 

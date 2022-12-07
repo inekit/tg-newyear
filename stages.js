@@ -8,16 +8,25 @@ const { titles } = require("telegraf-steps-engine");
 const mainStage = new Stage(
   [
     ...require("./scenes/mainScene"),
-    require("./scenes/clientScenes/getMoneyScene"),
     require("./scenes/clientScenes/withdrawalScene"),
-    require("./scenes/clientScenes/buyGoldScene"),
+    require("./scenes/clientScenes/catalogScene"),
+    require("./scenes/clientScenes/connectSupportScene"),
+    require("./scenes/clientScenes/sendReportScene"),
+    require("./scenes/clientScenes/static/helpScene"),
+    require("./scenes/clientScenes/static/profileScene"),
+    require("./scenes/clientScenes/static/referalsScene"),
+    require("./scenes/clientScenes/static/tasksScene"),
+    require("./scenes/clientScenes/myReportsScene"),
 
     require("./scenes/adminScenes/adminScene"),
+    require("./scenes/adminScenes/answerQuestionScene"),
+
+    require("./scenes/adminScenes/categoriesScene"),
     require("./scenes/adminScenes/adminsScene"),
     require("./scenes/adminScenes/adsLinkScene"),
     require("./scenes/adminScenes/waScene"),
-    require("./scenes/adminScenes/gaScene"),
-    require("./scenes/adminScenes/changeCourse"),
+    require("./scenes/adminScenes/reportsScene"),
+    require("./scenes/adminScenes/changeBalanceScene"),
   ],
   {
     default: "clientScene",
@@ -25,6 +34,14 @@ const mainStage = new Stage(
 );
 
 mainStage.start(async (ctx) => ctx.scene.enter("clientScene"));
+mainStage.command("web", (ctx) => ctx.scene.enter("catalogScene"));
+mainStage.command("tasks", (ctx) => ctx.scene.enter("tasksScene"));
+mainStage.command("refs", (ctx) => ctx.scene.enter("referalsScene"));
+mainStage.command("help", (ctx) => ctx.scene.enter("helpScene"));
+mainStage.command("lk", (ctx) => ctx.scene.enter("profileScene"));
+mainStage.command("report", (ctx) => ctx.scene.enter("myReportsScene"));
+
+mainStage.command("cashout", (ctx) => ctx.scene.enter("withdrawalScene"));
 mainStage.hears(titles.getValues("BUTTON_BACK_USER"), (ctx) =>
   ctx.scene.enter("clientScene")
 );

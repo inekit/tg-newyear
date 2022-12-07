@@ -34,11 +34,9 @@ const scene = new CustomWizardScene("waScene").enter(async (ctx) => {
 
   const keyboard = { name: "wa_keyboard", args: [lastWa.id] };
 
-  const sumToPay = (Number((lastWa.sum * 1.25).toFixed(0)) + 0.11).toFixed(2);
-
   const title = ctx.getTitle("WA_INFO", [
     lastWa.id,
-    sumToPay,
+    lastWa.sum,
     lastWa.withdrawal_address,
   ]);
 
@@ -95,7 +93,7 @@ async function rejectAppointment(ctx) {
 
       await connection
         .query(
-          "update users set balance_gold = balance_gold + $2 where id = $1",
+          "update users set balance_rub = balance_rub + $2 where id = $1",
           [customer_id, sum]
         )
         .catch(console.log);
