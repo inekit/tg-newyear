@@ -11,12 +11,12 @@ module.exports = new EntitySchema({
     },
     name: {
       type: "varchar",
-      length: 255,
+      length: 1000,
       nullable: true,
     },
     description: {
       type: "varchar",
-      length: 600,
+      length: 1000,
     },
     link: {
       type: "varchar",
