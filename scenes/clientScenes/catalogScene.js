@@ -18,7 +18,10 @@ async function getCategories(user_id) {
   const is_add_available = (
     await connection
       .query(
-        "select count(id) >= 10 is_add_available from reports r where status = 'aprooved' and customer_id = $1",
+        `select (count(r.id) >= 10 or not(max(user_id) ISNULL)) is_add_available
+        from reports r left join users u on r.customer_id = u.id left join admins a on a.user_id = u.id
+        where status = 'aprooved' and customer_id = $1
+        limit 1`,
         [user_id]
       )
       .catch((e) => {
