@@ -166,6 +166,8 @@
   "TRY_AGAIN": "Неверный формат ввода",
   "ENTER_ADDING_LINK": "Введите адрес ссылки",
   "NO_CATEGORIES_ADDED": "Пока не добавлено ни одной категории",
+  "NO_ITEMS_ADDED": "Пока не добавлено ни одного задания в этой категории",
+
   "INFO_BALANCE_BUTTON": "Баланс",
   "INFO_REFERALS_BUTTON": "Рефералы",
   "INFO_HOLD_BUTTON": "HOLD",
