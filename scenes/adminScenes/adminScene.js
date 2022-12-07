@@ -69,4 +69,8 @@ scene.hears(titles.getValues("BUTTON_COURSE"), (ctx) =>
   ctx.scene.enter("changeCourse", { main_menu_button })
 );
 
+scene.hears(titles.getValues("BUTTON_CHANGE_TEXT"), (ctx) =>
+  ctx.scene.enter("changeTextScene", { main_menu_button })
+);
+
 module.exports = scene;

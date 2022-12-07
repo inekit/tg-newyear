@@ -16,7 +16,7 @@ scene.addStep({
   variable: "photos",
   type: "action",
   handler: new FilesHandler(async (ctx) => {
-    const { course, item_id } = ctx.scene.state;
+    const { course, item_id, static_id } = ctx.scene.state;
 
     const { photos } = ctx.wizard.state.input;
 
@@ -30,6 +30,7 @@ scene.addStep({
         customer_id: ctx.from.id,
         item_photo_id: photos,
         item_id,
+        static_id,
       })
       .then(async (res) => {
         ctx.scene.state.sent = true;

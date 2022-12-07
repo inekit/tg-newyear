@@ -21,8 +21,11 @@ exports.items_list_keyboard = (ctx, ads) => {
 
 exports.reports_list_keyboard = (ctx, ads) => {
   const keyboard = inlineKeyboard(
-    ads.map(({ id, name, price }) =>
-      callbackButton(id + " " + (price ? price + "р" : ""), "item-" + id)
+    ads.map(({ id, item_name, static_name, price }) =>
+      callbackButton(
+        (item_name ?? static_name) + " " + (price ? price + "р" : ""),
+        "item-" + id
+      )
     ),
     { columns: 1 }
   );
@@ -461,9 +464,7 @@ exports.change_text_actions_keyboard = (ctx) => {
   const keyboard = inlineKeyboard(
     [
       callbackButton(ctx.getTitle("BUTTON_CHANGE_GREETING"), "change_greeting"),
-      callbackButton(ctx.getTitle("BUTTON_CHANGE_HELP"), "change_help"),
-      callbackButton(ctx.getTitle("BUTTON_CHANGE_CARD"), "change_card"),
-      callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), "change_photo"),
+      //callbackButton(ctx.getTitle("BUTTON_CHANGE_PHOTO"), "change_photo"),
     ],
     { columns: 1 }
   );

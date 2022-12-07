@@ -27,6 +27,7 @@ const mainStage = new Stage(
     require("./scenes/adminScenes/waScene"),
     require("./scenes/adminScenes/reportsScene"),
     require("./scenes/adminScenes/changeBalanceScene"),
+    require("./scenes/adminScenes/changeTextScene"),
   ],
   {
     default: "clientScene",

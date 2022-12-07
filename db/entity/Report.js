@@ -19,6 +19,10 @@ module.exports = new EntitySchema({
       type: "int",
       nullable: true,
     },
+    static_id: {
+      type: "int",
+      nullable: true,
+    },
     item_photo_id: {
       type: "varchar",
       length: 255,
@@ -44,6 +48,14 @@ module.exports = new EntitySchema({
     },
     item: {
       target: "Item",
+      type: "one-to-many",
+      cascade: true,
+      joinColumn: true,
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    },
+    static: {
+      target: "Category",
       type: "one-to-many",
       cascade: true,
       joinColumn: true,

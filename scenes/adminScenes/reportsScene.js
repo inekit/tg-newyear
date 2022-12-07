@@ -19,7 +19,10 @@ const scene = new CustomWizardScene("reportsScene").enter(async (ctx) => {
   const lastReport = (
     await connection
       .query(
-        `select r.*, i.name from reports r left join items i on r.item_id = i.id 
+        `select r.*, i.name item_name, u.username, c.name static_name from reports r 
+        left join items i on r.item_id = i.id 
+        left join users u on r.customer_id = u.id
+        left join categories c on r.static_id = c.id 
         where status = 'issued' order by datetime_created limit 1`
       )
       .catch((e) => {})
@@ -37,8 +40,9 @@ const scene = new CustomWizardScene("reportsScene").enter(async (ctx) => {
   const keyboard = { name: "reports_keyboard", args: [lastReport.id] };
   const title = ctx.getTitle("REPORT_INFO", [
     lastReport.id,
+    lastReport.username,
     lastReport.customer_id,
-    lastReport.name ?? "Задание с сайта",
+    lastReport.item_name ?? "Задание с сайта - " + lastReport.static_name,
   ]);
 
   await ctx.replyWithPhoto(lastReport.item_photo_id).catch((e) => {});
@@ -118,15 +122,15 @@ async function aprooveAppointment(ctx) {
       [sum, customer_id]
     );
     await queryRunner.query(
-      `update users set balance_rub = balance_rub + $1 where id = $2`,
+      `update users set balance_rub = balance_rub + $1, total_income_referal = total_income_referal + $1 where id = $2`,
       [(sum / 2).toFixed(0), referer_1]
     );
     await queryRunner.query(
-      `update users set balance_rub = balance_rub + $1 where id = $2`,
+      `update users set balance_rub = balance_rub + $1, total_income_referal = total_income_referal + $1 where id = $2`,
       [(sum / 4).toFixed(0), referer_2]
     );
     await queryRunner.query(
-      `update users set balance_rub = balance_rub + $1 where id = $2`,
+      `update users set balance_rub = balance_rub + $1, total_income_referal = total_income_referal + $1 where id = $2`,
       [(sum / 10).toFixed(0), referer_3]
     );
 

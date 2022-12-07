@@ -13,8 +13,10 @@ async function getItems(customer_id) {
 
   return await connection
     .query(
-      `select r.*, i.name task_type, i.price
-      from reports r left join items i on r.item_id = i.id
+      `select r.*, i.name item_name, i.price, c.name static_name from reports r 
+      left join items i on r.item_id = i.id 
+      left join users u on r.customer_id = u.id
+      left join categories c on r.static_id = c.id 
       where customer_id  = $1`,
       [customer_id]
     )
@@ -48,14 +50,25 @@ scene.action(/^item\-([0-9]+)$/g, async (ctx) => {
 
   const items = ctx.scene.state.items;
 
-  const { id, status, datetime_created, task_type, price, item_photo_id } =
-    items.find((el) => el.id == item_id);
+  const {
+    id,
+    status,
+    datetime_created,
+    item_name,
+    static_name,
+    price,
+    item_photo_id,
+  } = items.find((el) => el.id == item_id);
   await ctx.replyWithPhoto(item_photo_id).catch((e) => {});
   await ctx.replyWithKeyboard("REPORT_TITLE", "go_back_keyboard", [
     id,
-    task_type ? " по заданию " + task_type : " ",
+    item_name ?? static_name,
     price ? price + "р" : "неуказанную цену",
-    status,
+    status === "aprooved"
+      ? "одобрено"
+      : status === "rejected"
+      ? "отклонено"
+      : "на проверке",
     moment(datetime_created).locale("ru").format("lll"),
   ]);
 });

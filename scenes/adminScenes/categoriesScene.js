@@ -6,7 +6,7 @@ const {
 const titles = require("telegraf-steps-engine/middlewares/titles");
 const moment = require("moment");
 const nameHandler = new Composer(),
-  subCategoryHandler = new Composer(),
+  linkHandler = new Composer(),
   itemHandler = new Composer();
 const { CustomWizardScene } = require("telegraf-steps-engine");
 class FilesHandler extends Composer {
@@ -51,9 +51,14 @@ function inputFile(ctx, type) {
 
 nameHandler.on("text", (ctx) => {
   ctx.scene.state.input = { adding_name: ctx.message.text };
+  ctx.replyStepByVariable("files");
+});
+
+linkHandler.on("text", (ctx) => {
+  ctx.scene.state.input.adding_link = ctx.message.text;
   if (ctx.scene.state.table !== "item")
     ctx.replyWithKeyboard("CONFIRM", "confirm_keyboard");
-  else ctx.replyStepByVariable("files");
+  else ctx.replyStepByVariable("adding_price");
 });
 
 const scene = new CustomWizardScene("categoriesScene")
@@ -65,7 +70,7 @@ const scene = new CustomWizardScene("categoriesScene")
   .addStep({
     variable: "adding_subcategory_name",
     confines: ["string45"],
-    handler: nameHandler,
+    //handler: nameHandler,
   })
   .addStep({
     variable: "adding_name",
@@ -84,7 +89,7 @@ const scene = new CustomWizardScene("categoriesScene")
   })
   .addStep({ variable: "adding_description", confines: ["string1000"] })
   .addStep({ variable: "adding_instruction", confines: ["string1000"] })
-  .addStep({ variable: "adding_link" })
+  .addStep({ variable: "adding_link", handler: linkHandler })
   .addStep({ variable: "adding_price", confines: ["number"], type: "confirm" });
 
 scene.enter(async (ctx) => {
@@ -232,9 +237,16 @@ scene.action("confirm", async (ctx) => {
           break;
         }
         case "category": {
-          await addAction(`insert into categories (name) values ($1)`, [
-            adding_name,
-          ]);
+          await addAction(
+            `insert into categories (name, description, instruction,link, photo) values ($1,$2,$3,$4,$5)`,
+            [
+              adding_name,
+              adding_description,
+              adding_instruction,
+              adding_link,
+              photo,
+            ]
+          );
           break;
         }
         case "item": {
@@ -278,10 +290,17 @@ scene.action("confirm", async (ctx) => {
           break;
         }
         case "category": {
-          await editAction(`update categories set name = $1 where id = $2`, [
-            adding_name,
-            selected_item,
-          ]);
+          await editAction(
+            `update categories set name = $1, description=$2, instruction=$3, link=$4, photo = $5 where id = $6`,
+            [
+              adding_name,
+              adding_description,
+              adding_instruction,
+              adding_link,
+              photo,
+              selected_item,
+            ]
+          );
           break;
         }
         case "item": {

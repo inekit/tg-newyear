@@ -18,8 +18,8 @@ const scene = new CustomWizardScene("waScene").enter(async (ctx) => {
 
   const connection = await tOrmCon;
   const query = waiting
-    ? "select * from withdrawal_appointments wa where status = 'waiting' order by datetime_created limit 1"
-    : "select * from withdrawal_appointments wa where status = 'issued' order by datetime_created limit 1";
+    ? "select wa.*, u.username from withdrawal_appointments wa left join users u on wa.customer_id = u.id where status = 'waiting' order by datetime_created limit 1"
+    : "select wa.*, u.username from withdrawal_appointments wa left join users u on wa.customer_id = u.id where status = 'issued' order by datetime_created limit 1";
   const lastWa = (await connection.query(query).catch((e) => {}))?.[0];
 
   if (main_menu_button) await ctx.replyWithKeyboard("⚙️", main_menu_button);
@@ -38,6 +38,8 @@ const scene = new CustomWizardScene("waScene").enter(async (ctx) => {
 
   const title = ctx.getTitle("WA_INFO", [
     lastWa.id,
+    lastWa.username,
+    lastWa.customer_id,
     lastWa.sum,
     lastWa.withdrawal_address,
   ]);

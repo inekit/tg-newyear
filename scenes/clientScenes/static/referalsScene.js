@@ -15,6 +15,7 @@ scene.enter(async (ctx) => {
     userObj.referers_1_count,
     userObj.referers_2_count,
     userObj.referers_3_count,
+    userObj.total_income_referal,
   ]);
 
   ctx.scene.enter("clientScene", { visual: false });

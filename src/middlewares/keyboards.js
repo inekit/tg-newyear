@@ -59,7 +59,7 @@ exports.admin_keyboard = (ctx) =>
     [ctx.getTitle("BUTTON_WA"), ctx.getTitle("BUTTON_WA_WAIT")],
     [ctx.getTitle("BUTTON_ANSWERS"), ctx.getTitle("BUTTON_REPORTS")],
     [ctx.getTitle("BUTTON_BALANCE"), ctx.getTitle("BUTTON_CATALOG")],
-    [ctx.getTitle("BUTTON_ADMINS")],
+    [ctx.getTitle("BUTTON_ADMINS"), ctx.getTitle("BUTTON_CHANGE_TEXT")],
     [ctx.getTitle("BUTTON_CLIENT_MENU")],
   ]).resize();
 

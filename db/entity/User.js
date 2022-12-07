@@ -22,6 +22,11 @@ module.exports = new EntitySchema({
       nullable: false,
       default: 0,
     },
+    total_income_referal: {
+      type: "int",
+      nullable: false,
+      default: 0,
+    },
     referer_id: {
       type: "bigint",
       nullable: true,

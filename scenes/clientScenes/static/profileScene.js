@@ -15,11 +15,9 @@ scene.enter(async (ctx) => {
     (
       await connection
         .query(
-          `select sum(sum) sum
-    from withdrawal_appointments 
-    where customer_id = $1 
-    and (status = 'issued' or status = 'waiting') 
-    group by customer_id`,
+          `select sum(price) sum from reports r left join items i on r.item_id = i.id 
+          where status = 'issued' and customer_id = $1 
+          group by customer_id`,
           [ctx.from.id]
         )
         .catch(console.log)
