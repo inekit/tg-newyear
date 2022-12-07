@@ -12,10 +12,23 @@ const scene = new BaseScene("catalogScene");
 
 const tOrmCon = require("../../db/connection");
 
-async function getCategories() {
+async function getCategories(user_id) {
   const connection = await tOrmCon;
 
-  return await connection
+  const is_add_available = (
+    await connection
+      .query(
+        "select count(id) >= 10 is_add_available from reports r where status = 'aprooved' and customer_id = $1",
+        [user_id]
+      )
+      .catch((e) => {
+        console.log(e);
+      })
+  )?.[0]?.is_add_available;
+
+  //console.log(1, is_add_available);
+
+  const categories = await connection
     .query(
       `select *
     from categories c`
@@ -23,6 +36,10 @@ async function getCategories() {
     .catch((e) => {
       console.log(e);
     });
+
+  if (!is_add_available)
+    return categories?.filter((el) => el.name !== "Дополнительные");
+  else return categories;
 }
 
 async function getItems(categoryId) {
@@ -59,8 +76,9 @@ scene.enter(async (ctx) => {
       ctx.scene.state.category_name ?? "",
     ]);
   } else {
-    ctx.scene.state.categories =
-      ctx.scene.state.categories ?? (await getCategories());
+    const c_temp = await getCategories(ctx.from.id);
+
+    ctx.scene.state.categories = ctx.scene.state.categories ?? c_temp;
     keyboard = {
       name: "categories_list_keyboard",
       args: [ctx.scene.state.categories],

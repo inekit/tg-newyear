@@ -19,7 +19,8 @@ const scene = new CustomWizardScene("reportsScene").enter(async (ctx) => {
   const lastReport = (
     await connection
       .query(
-        "select * from reports where status = 'issued' order by datetime_created limit 1"
+        `select r.*, i.name from reports r left join items i on r.item_id = i.id 
+        where status = 'issued' order by datetime_created limit 1`
       )
       .catch((e) => {})
   )?.[0];
@@ -37,7 +38,7 @@ const scene = new CustomWizardScene("reportsScene").enter(async (ctx) => {
   const title = ctx.getTitle("REPORT_INFO", [
     lastReport.id,
     lastReport.customer_id,
-    lastReport.item_id,
+    lastReport.name ?? "Задание с сайта",
   ]);
 
   await ctx.replyWithPhoto(lastReport.item_photo_id).catch((e) => {});
@@ -132,7 +133,10 @@ async function aprooveAppointment(ctx) {
     await ctx.telegram
       .sendMessage(
         customer_id,
-        ctx.getTitle("REPORT_APROOVED", [appointment_id, sum])
+        ctx.getTitle("REPORT_APROOVED", [
+          appointment_id,
+          sum ? ` на сумму ${sum}р` : " ",
+        ])
       )
       .catch((e) => {});
 
@@ -193,7 +197,11 @@ async function rejectAppointment(ctx) {
       await ctx.telegram
         .sendMessage(
           customer_id,
-          ctx.getTitle("REPORT_REJECTED", [appointment_id, sum, reasonMes])
+          ctx.getTitle("REPORT_REJECTED", [
+            appointment_id,
+            sum ? ` на сумму ${sum}р` : " ",
+            reasonMes,
+          ])
         )
         .catch((e) => {});
 

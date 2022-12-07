@@ -12,23 +12,31 @@ scene.enter(async (ctx) => {
   const connection = await tOrmCon;
 
   const issued =
-    connection.query(
-      `select sum(sum) sum
+    (
+      await connection
+        .query(
+          `select sum(sum) sum
     from withdrawal_appointments 
     where customer_id = $1 
     and (status = 'issued' or status = 'waiting') 
     group by customer_id`,
-      [ctx.from.id]
+          [ctx.from.id]
+        )
+        .catch(console.log)
     )?.[0]?.sum ?? 0;
 
   const aprooved =
-    connection.query(
-      `select sum(sum) sum
+    (
+      await connection
+        .query(
+          `select sum(sum) sum
     from withdrawal_appointments 
     where customer_id = $1 
     and status = 'aprooved'
     group by customer_id`,
-      [ctx.from.id]
+          [ctx.from.id]
+        )
+        .catch(console.log)
     )?.[0]?.sum ?? 0;
 
   ctx.replyWithKeyboard("PROFILE_TITLE", "profile_keyboard", [

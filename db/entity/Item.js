@@ -17,6 +17,7 @@ module.exports = new EntitySchema({
     description: {
       type: "varchar",
       length: 1000,
+      nullable: true,
     },
     link: {
       type: "varchar",
@@ -25,6 +26,7 @@ module.exports = new EntitySchema({
     instruction: {
       type: "varchar",
       length: 2000,
+      nullable: true,
     },
     price: {
       type: "double precision",
