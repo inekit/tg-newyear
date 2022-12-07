@@ -34,7 +34,7 @@ async function getCategories(user_id) {
   const categories = await connection
     .query(
       `select *
-    from categories c`
+    from categories c order by id desc`
     )
     .catch((e) => {
       console.log(e);
