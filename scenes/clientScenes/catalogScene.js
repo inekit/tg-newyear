@@ -93,7 +93,8 @@ scene.action(/^category\-([0-9]+)$/g, async (ctx) => {
   const items = (ctx.scene.state.items = await getItems(category_id));
 
   if (!ctx.scene.state.items?.length) {
-    return await ctx.replyWithTitle("NO_ITEMS_ADDED");
+    await ctx.replyWithTitle("NO_ITEMS_ADDED");
+    return ctx.scene.enter("clientScene", { visual: false });
   }
 
   ctx.editMenu(ctx.getTitle("CHOOSE_ITEM", [category_name]), {
