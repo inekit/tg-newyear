@@ -9,6 +9,8 @@ const {
   createKeyboard,
   handlers: { FilesHandler },
 } = require("telegraf-steps-engine");
+const { customTransactMiddleware } = require("../../Utils/transact");
+
 const tOrmCon = require("../../db/connection");
 
 const scene = new CustomWizardScene("waScene").enter(async (ctx) => {
@@ -160,35 +162,51 @@ scene.action("reload", async (ctx) => {
 scene.action(/^aproove\-([0-9]+)$/g, async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
 
-  //ctx.wizard.state.claim_id = ctx.match[1];
-
   const connection = await tOrmCon;
 
-  connection
-    .query(
-      "update withdrawal_appointments set status = 'aprooved' where id = $1 returning customer_id, sum",
+  const queryRunner = connection.createQueryRunner();
+
+  await queryRunner.connect();
+
+  await queryRunner.startTransaction();
+
+  try {
+    const res = await queryRunner.query(
+      "update withdrawal_appointments set status = 'aprooved' where id = $1 returning customer_id, sum, withdrawal_address",
       [ctx.match[1]]
-    )
-    .then(async (res) => {
-      const customer_id = res[0]?.[0]?.customer_id;
-      const sum = res[0]?.[0]?.sum;
+    );
 
-      await ctx.telegram
-        .sendMessage(
-          customer_id,
-          ctx.getTitle("WA_APROOVED", [ctx.match[1], sum])
-        )
-        .catch((e) => {});
+    const { customer_id, sum, withdrawal_address } =
+      (ctx.scene.state.appointment_data = res[0]?.[0]);
 
-      ctx.scene.enter("waScene", {
-        edit: false,
-        waiting: ctx.wizard.state.waiting,
-      });
-    })
-    .catch(async (e) => {
-      console.log(e);
-      ctx.replyWithTitle("DB_ERROR");
+    const status = await customTransactMiddleware(
+      withdrawal_address,
+      sum,
+      "toCard",
+      customer_id
+    );
+
+    await ctx.telegram
+      .sendMessage(
+        customer_id,
+        ctx.getTitle("WA_APROOVED", [ctx.match[1], sum])
+      )
+      .catch((e) => {});
+
+    await queryRunner.commitTransaction();
+  } catch (err) {
+    console.log(err);
+    ctx.replyWithTitle(err.message ?? "DB_ERROR");
+
+    await queryRunner.rollbackTransaction();
+  } finally {
+    await queryRunner.release();
+
+    ctx.scene.enter("waScene", {
+      edit: false,
+      waiting: ctx.wizard.state.waiting,
     });
+  }
 });
 
 module.exports = scene;
