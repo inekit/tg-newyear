@@ -82,8 +82,8 @@ const scene = new CustomWizardScene("categoriesScene")
       ctx.replyNextStep();
     }),
   })
-  .addStep({ variable: "adding_description", confines: ["string255"] })
-  .addStep({ variable: "adding_instruction" })
+  .addStep({ variable: "adding_description", confines: ["string1000"] })
+  .addStep({ variable: "adding_instruction", confines: ["string1000"] })
   .addStep({ variable: "adding_link" })
   .addStep({ variable: "adding_price", confines: ["number"], type: "confirm" });
 
