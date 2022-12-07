@@ -38,7 +38,7 @@ async function getCategories(user_id) {
     });
 
   if (!is_add_available)
-    return categories?.filter((el) => el.name !== "Дополнительные");
+    return categories?.filter((el) => el.name !== "Дополнительно");
   else return categories;
 }
 
