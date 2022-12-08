@@ -73,7 +73,7 @@ scene.addNullStep().addStep({
 
         await ctx.telegram.sendMessage(
           customer_id,
-          ctx.getTitle("NEW_ANSWER", [ctx, answer_text])
+          ctx.getTitle("NEW_ANSWER", [answer_text])
         );
 
         ctx.replyWithKeyboard("ANSWER_SENT", "go_back_keyboard");

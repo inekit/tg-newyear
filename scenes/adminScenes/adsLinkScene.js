@@ -12,7 +12,7 @@ const {
   titles,
   handlers: { FilesHandler },
 } = require("telegraf-steps-engine");
-
+const fixMarkDown = require("../../Utils/fixMarkdown");
 const updateAdd = (ctx) => {
   ctx.scene.state.input.author_id = ctx.from?.id;
   const kb = (ctx.scene.state.input.keyboard = [[], []]);
@@ -67,7 +67,7 @@ scene
     cb: async (ctx) => {
       console.log(1111, ctx.scene.state.input);
 
-      const { links, text } = ctx.scene.state.input;
+      let { links, text } = ctx.scene.state.input;
 
       let kb = (ctx.scene.state.input.keyboard = [[], []]);
       links?.split(/\r\n|\n|\r/).forEach((linkStr) => {
@@ -91,25 +91,17 @@ scene
         .query("select id from users")
         .catch((e) => {});
 
+      text = fixMarkDown(text, ["*", "_"]);
       for (user of users) {
         let message = await ctx.telegram
-          .sendMessage(
-            user.id,
-            text.replaceAll(
-              /(\#)|(\.)|(\+)|(\=)|(\-)|(\*)|(\!)|(\?)|(\,)|(\()|(\))|(\%)|(\@)|(\~)|(\;)|(\^)|(\&)|(\")|(\:)|(\')$/g,
-              function replacer(match, p1, offset, string) {
-                return `\\${match}`;
-              }
-            ),
-            {
-              parse_mode: "MarkdownV2",
-              reply_markup: kbs.length
-                ? {
-                    inline_keyboard: [kbs],
-                  }
-                : undefined,
-            }
-          )
+          .sendMessage(user.id, text, {
+            parse_mode: "MarkdownV2",
+            reply_markup: kbs.length
+              ? {
+                  inline_keyboard: [kbs],
+                }
+              : undefined,
+          })
           .catch((e) => {
             console.log(e);
           });

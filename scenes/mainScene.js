@@ -70,29 +70,14 @@ scene.hears(titles.getValues("REPORT_BUTTON"), (ctx) =>
   ctx.scene.enter("myReportsScene")
 );
 
-scene.action(["referal_menu", "back_to_referal"], async (ctx) => {
-  await ctx.answerCbQuery().catch(console.log);
-
-  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
-
-  await ctx.replyWithTitle("REFERALS_TITLE", [
-    `t.me/${ctx.botInfo.username}?start=ref-${ctx.from.id}`,
-    userObj.referers_1_count,
-    userObj.referers_2_count,
-    userObj.referers_3_count,
-  ]);
-});
-
 scene.action("back_to_profile", async (ctx) => {
   await ctx.answerCbQuery().catch(console.log);
+  ctx.scene.enter("profileScene");
+});
 
-  const userObj = (ctx.scene.state.userObj = await getUser(ctx));
-
-  ctx.replyWithKeyboard("PROFILE_TITLE", "profile_keyboard", [
-    ctx.from.first_name ?? ctx.from.username,
-    ctx.from.id,
-    userObj?.balance_rub,
-  ]);
+scene.action(["referal_menu", "back_to_referal"], async (ctx) => {
+  await ctx.answerCbQuery().catch((e) => {});
+  ctx.scene.enter("referalsScene");
 });
 
 scene.hears(titles.getValues("WITHDRAWAL_BUTTON"), (ctx) =>

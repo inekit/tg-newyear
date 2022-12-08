@@ -48,7 +48,7 @@ class ConfineChecker {
     },
 
     text(text) {
-      return this.string2000(text);
+      return this.string1000(text);
     },
 
     laterDate(dateLast, date2) {
