@@ -12,11 +12,12 @@ exec("df -h > df.txt", (error) => {
   if (error) {
     return console.log(error);
   }
-  space = readFileSync("df.txt", (data, err) => {
-    if (err) {
-      throw err;
-    }
-  })
+  space = fs
+    .readFileSync("df.txt", (data, err) => {
+      if (err) {
+        throw err;
+      }
+    })
     .toString()
     .match(/[0-9]+\.[0-9]+?../)[0];
 });
