@@ -20,7 +20,8 @@ exec("df -h > df.txt", (error) => {
     })
     .toString()
     .match(/vda1(.+)/g)?.[0]
-    ?.split(/\s+/)?.[3];
+    ?.split(/\s+/)?.[3]
+    .match(/([0-9]+)G/);
 
   console.log(space);
 });
