@@ -56,7 +56,7 @@ module.exports = function getVideoFile(
 
               downloader.download({
                 url: details?.url,
-                processNum: 4,
+                processNum: 1,
                 filePath: "downloads",
                 fileName: `${id}`,
               });
