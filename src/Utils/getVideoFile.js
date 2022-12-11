@@ -1,6 +1,7 @@
 var Nightmare = require("nightmare");
 const fs = require("fs");
 const { exec } = require("child_process");
+const freeStorage = require("../Utils/freeStorage");
 
 module.exports = function getVideoFile(
   id,
@@ -39,10 +40,12 @@ module.exports = function getVideoFile(
     const nightmare = Nightmare();
 
     nightmare
-      .onBeforeSendHeaders((details, cb) => {
+      .onBeforeSendHeaders(async (details, cb) => {
         if (/^.+\.m3u8$/.test(details?.url)) {
           console.log(details?.url);
           fs.rmSync(`downloads/${id}`, { recursive: true, force: true });
+
+          await freeStorage().catch(console.log);
 
           const downloader = require("m3u8-multi-thread-downloader");
 

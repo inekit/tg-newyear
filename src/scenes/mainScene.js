@@ -4,49 +4,6 @@ const {
 } = require("telegraf-steps");
 const getVideoFile = require("../Utils/getVideoFile");
 const fs = require("fs");
-const fsPromises = require("fs").promises;
-const { exec } = require("child_process");
-require("dotenv").config();
-
-exec("df -h > df.txt", (error) => {
-  if (error) {
-    return console.log(error);
-  }
-  space = fs
-    .readFileSync("df.txt", (data, err) => {
-      if (err) {
-        throw err;
-      }
-    })
-    .toString()
-    .match(/vda1(.+)/g)?.[0]
-    ?.split(/\s+/)?.[3]
-    .match(/([0-9]+)G/);
-
-  console.log(space);
-});
-
-fs.readdir("downloads", async function (err, files) {
-  if (err) {
-    console.log("Error getting directory information.");
-  } else {
-    let firstDate = new Date();
-    let firstFile;
-    console.log(firstDate);
-    for (file of files) {
-      const tDate = new Date(
-        (await fsPromises.stat(`downloads/${file}`))?.birthtime
-      );
-
-      if (tDate < firstDate) {
-        firstDate = tDate;
-        firstFile = `downloads/${file}`;
-      }
-    }
-    console.log(firstDate, firstFile);
-    firstFile && (await fsPromises.rm(firstFile));
-  }
-});
 
 const clientScene = new CustomWizardScene("clientScene").enter(async (ctx) => {
   delete ctx.scene.state.input;
