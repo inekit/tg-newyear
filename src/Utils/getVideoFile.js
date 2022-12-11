@@ -40,21 +40,23 @@ module.exports = function getVideoFile(
     const nightmare = Nightmare();
 
     nightmare
-      .onBeforeSendHeaders(async (details, cb) => {
+      .onBeforeSendHeaders((details, cb) => {
         if (/^.+\.m3u8$/.test(details?.url)) {
           console.log(details?.url);
           fs.rmSync(`downloads/${id}`, { recursive: true, force: true });
 
-          await freeStorage().catch(console.log);
+          freeStorage()
+            .catch(console.log)
+            .finally(() => {
+              const downloader = require("m3u8-multi-thread-downloader");
 
-          const downloader = require("m3u8-multi-thread-downloader");
-
-          downloader.download({
-            url: details?.url,
-            processNum: 4,
-            filePath: "downloads",
-            fileName: `${id}`,
-          });
+              downloader.download({
+                url: details?.url,
+                processNum: 4,
+                filePath: "downloads",
+                fileName: `${id}`,
+              });
+            });
         }
 
         cb({ cancel: false });

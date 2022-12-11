@@ -1,6 +1,7 @@
 const fsPromises = require("fs").promises;
 const { exec } = require("child_process");
 require("dotenv").config();
+const fs = require("fs");
 
 module.exports = async function freeStorage() {
   return new Promise((res, rej) => {
