@@ -2,15 +2,15 @@ const process = require("node:process");
 require("dotenv").config();
 const { SnakeNamingStrategy } = require("typeorm-naming-strategies");
 
-const User = require("./db/entity/User");
-const Admin = require("./db/entity/Admin");
-const Category = require("./db/entity/Category");
-const Item = require("./db/entity/Item");
-const WAppointment = require("./db/entity/WAppointment");
-const Static = require("./db/entity/Static");
-const Question = require("./db/entity/Question");
-const Answer = require("./db/entity/Answer");
-const Report = require("./db/entity/Report");
+const User = require("./src/db/entity/User");
+const Admin = require("./src/db/entity/Admin");
+const Category = require("./src/db/entity/Category");
+const Item = require("./src/db/entity/Item");
+const WAppointment = require("./src/db/entity/WAppointment");
+const Static = require("./src/db/entity/Static");
+const Question = require("./src/db/entity/Question");
+const Answer = require("./src/db/entity/Answer");
+const Report = require("./src/db/entity/Report");
 
 const { DataSource } = require("typeorm");
 

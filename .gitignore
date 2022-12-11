@@ -2,7 +2,9 @@
 node_modules
 /dist
 /node_modules
+/downloads
 
+df.txt
 
 # local env files
 .env.local

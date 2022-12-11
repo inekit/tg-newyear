@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node src/index"
+  },
   "dependencies": {
     "@qiwi/bill-payments-node-js-sdk": "^3.2.1",
     "adm-zip": "^0.5.9",
@@ -9,16 +12,20 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "https-proxy-agent": "^5.0.1",
+    "m3u8-multi-thread-downloader": "^1.0.1",
     "moment": "^2.29.3",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
+    "nightmare": "^3.0.2",
     "node-fetch": "^2.6.7",
     "nominatim-geocoder": "^0.1.4",
     "pg": "^8.8.0",
     "telegraf": "^4.7.0",
-    "telegraf-steps-engine": "file:src",
+    "telegraf-steps": "^1.0.13",
     "typeorm": "^0.3.6",
-    "typeorm-naming-strategies": "^4.1.0"
+    "typeorm-naming-strategies": "^4.1.0",
+    "ya-disk": "^4.0.1",
+    "yandex-disk": "^0.0.8"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
