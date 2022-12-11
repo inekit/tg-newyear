@@ -47,6 +47,7 @@ module.exports = async function freeStorage() {
             res();
           }
         });
+      else res();
     });
   });
 };
