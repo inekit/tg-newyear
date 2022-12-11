@@ -19,7 +19,7 @@ exec("df -h > df.txt", (error) => {
       }
     })
     .toString()
-    .match(/\/dev\/vda1(.+)\\n/g);
+    .match(/vda1(.+)/g);
 
   console.log(space);
 });
