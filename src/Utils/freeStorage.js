@@ -31,6 +31,8 @@ module.exports = async function freeStorage() {
             let firstDate = new Date();
             let firstFile;
             for (file of files) {
+              if (!fs.lstatSync(`downloads/${file}`).isFile()) continue;
+
               const tDate = new Date(
                 (await fsPromises.stat(`downloads/${file}`))?.birthtime
               );
