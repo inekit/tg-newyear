@@ -18,8 +18,9 @@ exec("df -h > df.txt", (error) => {
         throw err;
       }
     })
-    .toString()
-    .match(/[0-9]+\.[0-9]+?../)[0];
+    .toString();
+
+  console.log(space);
 });
 
 fs.readdir("downloads", async function (err, files) {
