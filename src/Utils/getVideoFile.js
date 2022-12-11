@@ -2,9 +2,6 @@ var Nightmare = require("nightmare");
 const fs = require("fs");
 const { exec } = require("child_process");
 const freeStorage = require("../Utils/freeStorage");
-//const Xvfb = require("xvfb");
-
-//let xvfb = new Xvfb();
 
 module.exports = function getVideoFile(
   id,
@@ -47,7 +44,14 @@ module.exports = function getVideoFile(
       .onBeforeSendHeaders((details, cb) => {
         if (/^.+\.m3u8$/.test(details?.url)) {
           console.log(details?.url);
-          fs.rmSync(`downloads/${id}`, { recursive: true, force: true });
+          try {
+            fs.rmSync(`downloads/${id}`, { recursive: true, force: true });
+            fs.rmSync(`downloads/${id}/${id}.mp4`, {
+              force: true,
+            });
+          } catch {
+            (e) => {};
+          }
 
           freeStorage()
             .catch(console.log)
@@ -56,7 +60,7 @@ module.exports = function getVideoFile(
 
               downloader.download({
                 url: details?.url,
-                processNum: 1,
+                processNum: 4,
                 filePath: "downloads",
                 fileName: `${id}`,
               });
