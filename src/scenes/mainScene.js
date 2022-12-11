@@ -37,6 +37,8 @@ clientScene
   })
   .addStep({
     variable: "name",
+    confines: ["string45"],
+
     cb: (ctx) => {
       ctx.wizard.state.input.name = ctx.message.text;
       if (ctx.wizard.state.input.scenario === "one_kid")
@@ -46,6 +48,7 @@ clientScene
   })
   .addStep({
     variable: "age",
+    confines: ["number"],
     cb: (ctx) => {
       ctx.wizard.state.input.age = ctx.message.text;
 
@@ -54,6 +57,7 @@ clientScene
   })
   .addStep({
     variable: "name_second",
+    confines: ["string45"],
     cb: (ctx) => {
       ctx.wizard.state.input.name_second = ctx.message.text;
 
@@ -123,12 +127,14 @@ clientScene
         pathParts[pathParts.length - 1]
       }`;
 
-      await ctx.replyWithVideo(fLink).catch((e) => {});
+      //await ctx.replyWithVideo(fLink).catch((e) => {});
 
-      ctx.replyWithKeyboard("Видео можно посмотреть по ссылке ниже", {
+      await ctx.replyWithKeyboard("Видео можно посмотреть по ссылке ниже", {
         name: "link_keyboard",
         args: [fLink],
       });
+
+      ctx.replyNextStep();
 
       /*const { info, list, upload, download } = require("ya-disk");
 

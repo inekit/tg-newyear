@@ -23,7 +23,7 @@ module.exports = async function freeStorage() {
       console.log(space);
       if (!space) rej();
 
-      if (space < 20)
+      if (space < 3)
         fs.readdir("downloads", async function (err, files) {
           if (err) {
             rej(err);
