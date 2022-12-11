@@ -41,7 +41,7 @@ module.exports = function getVideoFile(
           ? `https://newyear.mail.ru/?name=${name}&name_second=${name_second}&scenario=${scenario}&action=${action}`
           : `https://newyear.mail.ru/?scenario=${scenario}&action=${action}`;
 
-      const nightmare = Nightmare();
+      const nightmare = Nightmare({ show: false, waitTimeout: 40000 });
 
       nightmare
         .onBeforeSendHeaders((details, cb) => {
