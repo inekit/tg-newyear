@@ -8,7 +8,7 @@ const fsPromises = require("fs").promises;
 const { exec } = require("child_process");
 require("dotenv").config();
 
-exec("df -h => df.txt", (error) => {
+exec("df -h > df.txt", (error) => {
   if (error) {
     return console.log(error);
   }
