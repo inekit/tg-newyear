@@ -2,7 +2,15 @@ var Nightmare = require("nightmare");
 const fs = require("fs");
 const { exec } = require("child_process");
 const freeStorage = require("../Utils/freeStorage");
+const Xvfb = require("xvfb");
 
+let xvfb = new Xvfb();
+
+try {
+  xvfb.startSync();
+} catch (e) {
+  console.log(e);
+}
 module.exports = function getVideoFile(
   id,
   scenario,
