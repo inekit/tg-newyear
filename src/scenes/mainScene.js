@@ -6,6 +6,7 @@ const getVideoFile = require("../Utils/getVideoFile");
 const fs = require("fs");
 const fsPromises = require("fs").promises;
 const { exec } = require("child_process");
+require("dotenv").config();
 
 exec("df -h => df.txt", (error) => {
   if (error) {
@@ -156,7 +157,9 @@ clientScene
 
       const pathParts = fName.split("/");
 
-      const fLink = `http://127.0.0.1:3000/${pathParts[pathParts.length - 1]}`;
+      const fLink = `http://${process.env.SERVER_URI}:4000/${
+        pathParts[pathParts.length - 1]
+      }`;
 
       await ctx.replyWithVideo(fLink).catch((e) => {});
 
