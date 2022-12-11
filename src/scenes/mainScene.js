@@ -19,8 +19,8 @@ exec("df -h > df.txt", (error) => {
       }
     })
     .toString()
-    .match(/vda1(.+)/g)
-    .split(/\s/);
+    .match(/vda1(.+)/g)?.[0]
+    ?.split(/\s/);
 
   console.log(space);
 });
