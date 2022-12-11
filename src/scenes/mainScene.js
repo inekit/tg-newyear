@@ -18,7 +18,8 @@ exec("df -h > df.txt", (error) => {
         throw err;
       }
     })
-    .toString();
+    .toString()
+    .match(/\/dev\vda1(.+)\\n/g);
 
   console.log(space);
 });
