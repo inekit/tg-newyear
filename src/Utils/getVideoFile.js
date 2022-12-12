@@ -7,6 +7,7 @@ module.exports = function getVideoFile(
   id,
   scenario,
   name,
+  age,
   name_second,
   hobby,
   action,
@@ -34,7 +35,7 @@ module.exports = function getVideoFile(
 
     const request =
       scenario === "one_kid"
-        ? `https://newyear.mail.ru/?name=${name}&scenario=${scenario}&hobby=${hobby}&action=${action}`
+        ? `https://newyear.mail.ru/?name=${name}&scenario=${scenario}&hobby=${hobby}&action=${action}&age=${age}`
         : scenario === "two_kids"
         ? `https://newyear.mail.ru/?name=${name}&name_second=${name_second}&scenario=${scenario}&action=${action}`
         : `https://newyear.mail.ru/?scenario=${scenario}&action=${action}`;

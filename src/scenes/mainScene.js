@@ -30,6 +30,7 @@ clientScene
       const scenario = ctx.match[0];
       ctx.wizard.state.input = { scenario };
 
+      if (scenario === "one_kid") return ctx.replyStepByVariable("name_first");
       if (scenario !== "many_kids") return ctx.replyNextStep();
 
       ctx.replyStepByVariable("action");
@@ -43,6 +44,14 @@ clientScene
       ctx.wizard.state.input.name = ctx.message.text;
       if (ctx.wizard.state.input.scenario === "one_kid")
         return ctx.replyStepByVariable("age");
+      return ctx.replyStepByVariable("name_second");
+    },
+  })
+  .addStep({
+    variable: "name_first",
+    confines: ["string45"],
+
+    cb: (ctx) => {
       return ctx.replyStepByVariable("name_second");
     },
   })
@@ -97,16 +106,16 @@ clientScene
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      const { scenario, name, name_second, hobby, action } =
+      const { scenario, name, name_second, hobby, action, age } =
         ctx.wizard.state.input;
 
-      const path = [scenario, name, name_second, hobby, action].join("_");
+      const path = [scenario, name, name_second, hobby, age, action].join("_");
 
       await ctx.replyWithTitle("WAIT_PLEASE");
 
       //const [fName, folder] = await
 
-      getVideoFile(path, scenario, name, name_second, hobby, action, ctx);
+      getVideoFile(path, scenario, name, age, name_second, hobby, action, ctx);
 
       //var newPath = folder.slice(0, -1) + ".mp4";
 
