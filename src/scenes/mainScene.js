@@ -103,7 +103,7 @@ clientScene
   .addSelect({
     variable: "payment",
     options: {
-      "Я оплатил": "pay",
+      Оплатить: "pay",
     },
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
