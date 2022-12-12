@@ -30,7 +30,7 @@ clientScene
       const scenario = ctx.match[0];
       ctx.wizard.state.input = { scenario };
 
-      if (scenario === "one_kid") return ctx.replyStepByVariable("name_first");
+      if (scenario === "two_kids") return ctx.replyStepByVariable("name_first");
       if (scenario !== "many_kids") return ctx.replyNextStep();
 
       ctx.replyStepByVariable("action");
