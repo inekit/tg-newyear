@@ -52,6 +52,8 @@ clientScene
     confines: ["string45"],
 
     cb: (ctx) => {
+      ctx.wizard.state.input.name = ctx.message.text;
+
       return ctx.replyStepByVariable("name_second");
     },
   })
@@ -106,10 +108,8 @@ clientScene
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      let { scenario, name, name_first, name_second, hobby, action, age } =
+      const { scenario, name, name_second, hobby, action, age } =
         ctx.wizard.state.input;
-
-      name = name ?? name_first;
 
       const path = [scenario, name, name_second, hobby, age, action].join("_");
 
