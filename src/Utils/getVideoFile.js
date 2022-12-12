@@ -14,7 +14,6 @@ module.exports = function getVideoFile(
   ctx
 ) {
   return new Promise((resolve, rej) => {
-    //xvfb.start(function (err, xvfbProcess) {
     Nightmare.action(
       "onBeforeSendHeaders",
       function (name, options, parent, win, renderer, done) {
@@ -60,14 +59,32 @@ module.exports = function getVideoFile(
           freeStorage()
             .catch(console.log)
             .finally(() => {
-              const download = require("node-hls-downloader").download; //require("m3u8-multi-thread-downloader");
+              const download = require("node-hls-downloader").download;
 
               download({
                 streamUrl: details?.url,
                 concurrency: 4,
                 filePath: "downloads",
                 outputFile: `downloads/${id}.mp4`,
-              });
+              })
+                .then(async (res) => {
+                  console.log("file downloaded");
+                  const fLink = `http://${process.env.SERVER_URI}:4000/${id}.mp4`;
+
+                  await ctx.replyWithKeyboard(
+                    "Видео можно посмотреть по ссылке ниже",
+                    {
+                      name: "link_keyboard",
+                      args: [fLink],
+                    }
+                  );
+
+                  resolve([`downloads/${id}.mp4`, `downloads/${id}/`]);
+                })
+                .catch((e) => {
+                  console.log(e);
+                  rej(e);
+                });
             });
         }
 
@@ -76,40 +93,6 @@ module.exports = function getVideoFile(
       .goto(request)
       .click(".js-play-name")
       .end()
-      .then((res) => {
-        fs.watchFile(`downloads/${id}.mp4`, async (curr, prev) => {
-          try {
-            if (fs.lstatSync(`downloads/${id}.mp4`).isFile()) {
-              console.log("file downloaded");
-              //const cmd = `ffmpeg -i downloads/${id}/${id}.mp4 -vf scale=850:480 downloads/${id}/${id}cropped.mp4`;
-
-              const pathParts = `${id}.mp4`;
-
-              const fLink = `http://${process.env.SERVER_URI}:4000/${id}.mp4`;
-
-              await ctx.replyWithKeyboard(
-                "Видео можно посмотреть по ссылке ниже",
-                {
-                  name: "link_keyboard",
-                  args: [fLink],
-                }
-              );
-              resolve([`downloads/${id}.mp4`, `downloads/${id}/`]);
-              /*exec(cmd, (error) => {
-                if (error) {
-                  return rej();
-                }
-                console.log("file cropped");
-                resolve([
-                  `downloads/${id}/${id}cropped.mp4`,
-                  `downloads/${id}/`,
-                ]);
-              });*/
-            }
-          } catch {}
-        });
-      });
-    //xvfb.stop(function (err) {});
-    //});
+      .then(() => {});
   });
 };
