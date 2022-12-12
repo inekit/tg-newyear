@@ -106,7 +106,7 @@ clientScene
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      const { scenario, name, name_first, name_second, hobby, action, age } =
+      let { scenario, name, name_first, name_second, hobby, action, age } =
         ctx.wizard.state.input;
 
       name = name ?? name_first;
