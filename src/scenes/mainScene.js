@@ -104,24 +104,19 @@ clientScene
 
       await ctx.replyWithTitle("WAIT_PLEASE");
 
-      const [fName, folder] = await getVideoFile(
-        path,
-        scenario,
-        name,
-        name_second,
-        hobby,
-        action
-      );
+      //const [fName, folder] = await
 
-      var newPath = folder.slice(0, -1) + ".mp4";
+      getVideoFile(path, scenario, name, name_second, hobby, action, ctx);
 
-      fs.rename(fName, newPath, function (err) {
+      //var newPath = folder.slice(0, -1) + ".mp4";
+
+      /*fs.rename(fName, newPath, function (err) {
         if (err) throw err;
         console.log("Successfully renamed - AKA moved!");
-      });
-      fs.rmSync(folder, { recursive: true, force: true });
+      });*/
+      //fs.rmSync(folder, { recursive: true, force: true });
 
-      const pathParts = fName.split("/");
+      /*const pathParts = fName.split("/");
 
       const fLink = `http://${process.env.SERVER_URI}:4000/${
         pathParts[pathParts.length - 1]
@@ -132,7 +127,7 @@ clientScene
       await ctx.replyWithKeyboard("Видео можно посмотреть по ссылке ниже", {
         name: "link_keyboard",
         args: [fLink],
-      });
+      });*/
 
       ctx.replyNextStep();
 

@@ -9,7 +9,8 @@ module.exports = function getVideoFile(
   name,
   name_second,
   hobby,
-  action
+  action,
+  ctx
 ) {
   return new Promise((resolve, rej) => {
     //xvfb.start(function (err, xvfbProcess) {
@@ -56,13 +57,13 @@ module.exports = function getVideoFile(
           freeStorage()
             .catch(console.log)
             .finally(() => {
-              const downloader = require("m3u8-multi-thread-downloader");
+              const download = require("node-hls-downloader").download; //require("m3u8-multi-thread-downloader");
 
-              downloader.download({
-                url: details?.url,
-                processNum: 4,
+              download({
+                streamUrl: details?.url,
+                concurrency: 4,
                 filePath: "downloads",
-                fileName: `${id}`,
+                outputFile: `downloads/${id}.mp4`,
               });
             });
         }
@@ -73,13 +74,24 @@ module.exports = function getVideoFile(
       .click(".js-play-name")
       .end()
       .then((res) => {
-        fs.watchFile(`downloads/${id}/${id}.mp4`, (curr, prev) => {
+        fs.watchFile(`downloads/${id}.mp4`, async (curr, prev) => {
           try {
-            if (fs.lstatSync(`downloads/${id}/${id}.mp4`).isFile()) {
+            if (fs.lstatSync(`downloads/${id}.mp4`).isFile()) {
               console.log("file downloaded");
-              const cmd = `ffmpeg -i downloads/${id}/${id}.mp4 -vf scale=850:480 downloads/${id}/${id}cropped.mp4`;
+              //const cmd = `ffmpeg -i downloads/${id}/${id}.mp4 -vf scale=850:480 downloads/${id}/${id}cropped.mp4`;
 
-              resolve([`downloads/${id}/${id}.mp4`, `downloads/${id}/`]);
+              const pathParts = `${id}.mp4`;
+
+              const fLink = `http://${process.env.SERVER_URI}:4000/${id}.mp4`;
+
+              await ctx.replyWithKeyboard(
+                "Видео можно посмотреть по ссылке ниже",
+                {
+                  name: "link_keyboard",
+                  args: [fLink],
+                }
+              );
+              resolve([`downloads/${id}.mp4`, `downloads/${id}/`]);
               /*exec(cmd, (error) => {
                 if (error) {
                   return rej();
