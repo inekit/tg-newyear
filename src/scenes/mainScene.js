@@ -106,8 +106,10 @@ clientScene
     cb: async (ctx) => {
       await ctx.answerCbQuery().catch(console.log);
 
-      const { scenario, name, name_second, hobby, action, age } =
+      const { scenario, name, name_first, name_second, hobby, action, age } =
         ctx.wizard.state.input;
+
+      name = name ?? name_first;
 
       const path = [scenario, name, name_second, hobby, age, action].join("_");
 
